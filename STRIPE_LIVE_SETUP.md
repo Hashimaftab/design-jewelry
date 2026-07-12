@@ -24,14 +24,19 @@ For testing before Live activation, use **Test mode** keys (`pk_test_...` / `sk_
 
 ## 3. Live webhook (required)
 
-**Developers → Webhooks → Add endpoint**
+**Developers → Webhooks → Add endpoint** (or use Stripe CLI in test mode):
 
-- **URL:** `https://api.husnx.com/api/v1/payments/webhook/stripe`
-- **Events:**
-  - `payment_intent.succeeded`
-  - `payment_intent.payment_failed`
-  - `payment_intent.canceled`
-- Copy **Signing secret** `whsec_...` → Railway → `STRIPE_WEBHOOK_SECRET`
+```bash
+stripe webhook_endpoints create \
+  --url "https://api.husnx.com/api/v1/payments/webhook/stripe" \
+  --enabled-events payment_intent.succeeded \
+  --enabled-events payment_intent.payment_failed \
+  --enabled-events payment_intent.canceled
+```
+
+Copy the returned **Signing secret** `whsec_...` → Railway → `STRIPE_WEBHOOK_SECRET`
+
+**Test mode webhook is already configured** for `api.husnx.com`. When you switch to Live mode, create a **new Live webhook** with the same URL and update Railway with the new `whsec_...`.
 
 Redeploy the Railway **api** service after saving.
 
