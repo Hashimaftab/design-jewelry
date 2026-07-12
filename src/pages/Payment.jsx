@@ -62,7 +62,12 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
   return (
     <form onSubmit={handleSubmit} className="payment-form">
       <div className="payment-element-wrap">
-        <PaymentElement options={{ layout: 'tabs' }} />
+        <PaymentElement
+          options={{
+            layout: 'tabs',
+            paymentMethodOrder: ['ideal', 'card'],
+          }}
+        />
       </div>
       <button type="submit" className="pay-now-btn" disabled={!stripe || busy}>
         {busy ? 'Processing…' : `Pay ${formatStorePrice(grandTotal)}`}
@@ -118,7 +123,7 @@ const Payment = () => {
           return;
         }
 
-        const intent = await createStripePaymentIntent(orderId, 'card', token);
+        const intent = await createStripePaymentIntent(orderId, token);
         if (!intent?.clientSecret) {
           throw new Error('Could not start payment session.');
         }
@@ -180,8 +185,8 @@ const Payment = () => {
           <section className="form-section">
             <h2>Order payment</h2>
             <p className="form-desc">
-              Pay securely with Stripe. Card details are handled by Stripe and never touch our
-              servers.
+              Pay securely with iDEAL | Wero or card (Visa, Mastercard). Payment details are
+              handled by Stripe and never touch our servers.
             </p>
 
             {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}

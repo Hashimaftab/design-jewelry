@@ -2,6 +2,20 @@
 
 Payments use **Stripe.js Payment Element** (PCI-safe). Card numbers never pass through your server.
 
+Supported methods: **iDEAL | Wero** (Dutch bank redirect) and **cards** (Visa, Mastercard, etc.).
+
+## 0. Enable payment methods (do this first)
+
+1. [dashboard.stripe.com](https://dashboard.stripe.com) → stay in **Test mode** while developing
+2. **Settings → Payment methods** → enable:
+   - **Cards**
+   - **iDEAL** (co-branded **iDEAL | Wero** in 2026)
+3. **Developers → API keys** → copy:
+   - `pk_test_...` → Vercel `VITE_STRIPE_PUBLISHABLE_KEY`
+   - `sk_test_...` → Railway `STRIPE_SECRET_KEY`
+
+Redeploy both services after setting keys. Test with Payment Element on husnx.com before switching to Live mode.
+
 ## 1. Stripe Dashboard — activate Live mode
 
 1. [dashboard.stripe.com](https://dashboard.stripe.com) → complete **Business** profile (legal name, address, website `https://husnx.com`)
@@ -66,8 +80,9 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 | Step | Keys | Action |
 |------|------|--------|
 | 1 | Test | Checkout on husnx.com → Stripe Payment Element → card `4242 4242 4242 4242` |
-| 2 | Test | Stripe Dashboard → Webhooks → event delivered (200) |
-| 3 | Live | One small real order → refund in Stripe if needed |
+| 2 | Test | Same flow → choose **iDEAL** test bank → redirect back to order success |
+| 3 | Test | Stripe Dashboard → Webhooks → event delivered (200) |
+| 4 | Live | One small real order (card or iDEAL) → refund in Stripe if needed |
 
 ## 7. Verify
 
