@@ -90,6 +90,24 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - Network tab: no `cardNumber` sent to `api.husnx.com`
 - Order status becomes `paid` after payment
 - `POST /payments/orders/:id/confirm` returns **410** in production (raw cards disabled)
+- iDEAL | Wero tab appears in Payment Element (enable iDEAL in Stripe Dashboard)
+
+### Automated checks (July 2026)
+
+| Check | Status |
+|-------|--------|
+| `GET https://api.husnx.com/health` | 200 OK |
+| `GET /api/v1/payments/store-config` | NL / EUR / 21% BTW |
+| Vercel `VITE_STRIPE_PUBLISHABLE_KEY` set | Yes |
+| Frontend deployed to husnx.com | Yes |
+| Backend `allow_redirects: always` pushed | Yes — redeploy Railway if not auto-deployed |
+
+### Manual E2E test (you run after Stripe keys are set)
+
+1. Login on husnx.com → add item → checkout → payment page
+2. **Card:** use `4242 4242 4242 4242` in Payment Element → order success
+3. **iDEAL:** choose iDEAL test bank → redirect → order success (polls until webhook marks paid)
+4. Stripe Dashboard → Webhooks → confirm 200 responses
 
 ## Local development
 
