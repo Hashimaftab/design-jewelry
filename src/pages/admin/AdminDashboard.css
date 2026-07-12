@@ -1,0 +1,113 @@
+.admin-dashboard__intro {
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard__intro h2 {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--color-charcoal, #36454f);
+  margin-bottom: 0.35rem;
+}
+
+.admin-dashboard__intro p {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #747f87);
+  max-width: 32rem;
+}
+
+.admin-dashboard__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .admin-dashboard__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .admin-dashboard__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.admin-stat-card {
+  padding: 1.35rem 1.25rem;
+  border: 1px solid rgba(54, 69, 79, 0.1);
+  background: var(--color-surface, #ffffff);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(54, 69, 79, 0.06);
+}
+
+.admin-stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.06));
+  pointer-events: none;
+}
+
+.admin-stat-card__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold, #d4af37);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.admin-stat-card__label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-secondary, #747f87);
+  margin-bottom: 0.5rem;
+}
+
+.admin-stat-card__value {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.65rem;
+  color: var(--color-charcoal, #36454f);
+  margin-bottom: 0.5rem;
+}
+
+.admin-stat-card__hint {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary, #747f87);
+  line-height: 1.45;
+}
+
+.admin-dashboard__panel {
+  margin-top: 2.5rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: var(--color-ivory, #fafaf7);
+  border-radius: 4px;
+  max-width: 42rem;
+}
+
+.admin-dashboard__panel h3 {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--color-charcoal, #36454f);
+  margin-bottom: 0.75rem;
+}
+
+.admin-dashboard__panel p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #747f87);
+}

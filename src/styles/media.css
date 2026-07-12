@@ -1,0 +1,131 @@
+/**
+ * Consistent image frames sitewide.
+ * Product photos use "contain" so the full upload is visible (no harsh zoom/crop).
+ */
+
+.media-frame {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  isolation: isolate;
+}
+
+.media-frame__placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(145deg, var(--color-ivory) 0%, rgba(54, 69, 79, 0.06) 100%);
+}
+
+/* Default: fill frame (category marketing banners, etc.) */
+.media-frame--cover > img,
+.media-frame--cover .media-frame__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Product images: show full picture inside a fixed box */
+.media-frame--product,
+.media-frame--product-detail,
+.media-frame--preview,
+.media-frame--preview-lg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid rgba(54, 69, 79, 0.08);
+}
+
+.media-frame--product > img,
+.media-frame--product-detail > img,
+.media-frame--preview > img,
+.media-frame--preview-lg > img {
+  position: relative;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+/* Storefront product cards */
+.media-frame--product {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: min(300px, 42vw);
+  padding: 0.65rem;
+  box-sizing: border-box;
+  border-radius: 3px;
+}
+
+/* Product detail */
+.media-frame--product-detail {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: min(480px, 85vw);
+  padding: 1rem;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+/* Home category tiles */
+.media-frame--category {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 260px;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  padding: 0;
+}
+
+.media-frame--category > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Admin table — small thumb, cover is fine */
+.media-frame--thumb {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0.2rem;
+  box-sizing: border-box;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-frame--thumb > img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.media-frame--preview {
+  width: 100%;
+  max-width: 12rem;
+  aspect-ratio: 1;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.media-frame--preview-lg {
+  width: 100%;
+  max-width: 20rem;
+  aspect-ratio: 1;
+  padding: 0.75rem;
+  box-sizing: border-box;
+}

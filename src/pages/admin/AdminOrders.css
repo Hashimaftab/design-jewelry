@@ -1,0 +1,54 @@
+.admin-orders__head {
+  margin-bottom: 2rem;
+}
+
+.admin-orders__head h2 {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--color-charcoal, #36454f);
+  margin-bottom: 0.35rem;
+}
+
+.admin-orders__head p {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #747f87);
+  max-width: 34rem;
+}
+
+.admin-orders__empty {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  border: 1px solid rgba(54, 69, 79, 0.1);
+  background: var(--color-surface, #ffffff);
+  border-radius: 4px;
+  max-width: 28rem;
+  box-shadow: 0 4px 24px rgba(54, 69, 79, 0.06);
+}
+
+.admin-orders__empty-icon {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gold, #d4af37);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.admin-orders__empty h3 {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--color-charcoal, #36454f);
+  margin-bottom: 0.65rem;
+}
+
+.admin-orders__empty p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #747f87);
+}
