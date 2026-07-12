@@ -1,18 +1,75 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { AuthContext } from '../context/AuthContext';
 import {
   ApiRequestError,
-  STRIPE_TEST_CARD,
   formatStorePrice,
   getStoreConfig,
   getOrderPaymentSummary,
   createStripePaymentIntent,
-  confirmCardPayment,
 } from '../api/payments.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
 import './Checkout.css';
+
+const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
+
+function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    onError('');
+
+    if (!stripe || !elements) {
+      onError('Payment form is still loading. Please wait a moment.');
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: { return_url: returnUrl },
+        redirect: 'if_required',
+      });
+
+      if (confirmError) {
+        onError(confirmError.message || 'Payment failed.');
+        return;
+      }
+
+      if (paymentIntent?.status === 'succeeded') {
+        navigate(`/order-success/${orderId}`, { replace: true });
+        return;
+      }
+
+      onError('Payment did not complete. Please try again.');
+    } catch (err) {
+      onError(err?.message || 'Payment failed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="payment-form">
+      <div className="payment-element-wrap">
+        <PaymentElement options={{ layout: 'tabs' }} />
+      </div>
+      <button type="submit" className="pay-now-btn" disabled={!stripe || busy}>
+        {busy ? 'Processing…' : `Pay ${formatStorePrice(grandTotal)}`}
+      </button>
+    </form>
+  );
+}
 
 const Payment = () => {
   const { token } = useContext(AuthContext);
@@ -22,15 +79,19 @@ const Payment = () => {
 
   const [storeConfig, setStoreConfig] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [card, setCard] = useState({
-    cardNumber: '',
-    cvv: '',
-    expMonth: 12,
-    expYear: 2030,
-  });
+
+  const returnUrl = useMemo(
+    () => `${window.location.origin}/order-success/${orderId}`,
+    [orderId],
+  );
+
+  const elementsOptions = useMemo(
+    () => (clientSecret ? { clientSecret, appearance: { theme: 'stripe' } } : null),
+    [clientSecret],
+  );
 
   useEffect(() => {
     if (!token) {
@@ -43,6 +104,12 @@ const Payment = () => {
       setError('');
 
       try {
+        if (!publishableKey) {
+          throw new Error(
+            'Stripe is not configured. Set VITE_STRIPE_PUBLISHABLE_KEY in your environment.',
+          );
+        }
+
         const config = await getStoreConfig();
         const orderSummary = await getOrderPaymentSummary(orderId, token);
 
@@ -51,10 +118,20 @@ const Payment = () => {
           return;
         }
 
+        const intent = await createStripePaymentIntent(orderId, 'card', token);
+        if (!intent?.clientSecret) {
+          throw new Error('Could not start payment session.');
+        }
+
         setStoreConfig(config);
         setSummary(orderSummary);
+        setClientSecret(intent.clientSecret);
       } catch (err) {
-        setError(err instanceof ApiRequestError ? err.message : getApiErrorMessage(err, 'Could not load payment details.'));
+        setError(
+          err instanceof ApiRequestError
+            ? err.message
+            : getApiErrorMessage(err, 'Could not load payment details.'),
+        );
       } finally {
         setLoading(false);
       }
@@ -63,45 +140,26 @@ const Payment = () => {
     load();
   }, [token, orderId, navigate, location.pathname]);
 
-  const handleTestCard = () => {
-    setCard({
-      cardNumber: STRIPE_TEST_CARD.cardNumber,
-      cvv: STRIPE_TEST_CARD.cvv,
-      expMonth: STRIPE_TEST_CARD.expMonth,
-      expYear: STRIPE_TEST_CARD.expYear,
-    });
-  };
-
-  const handlePay = async (event) => {
-    event.preventDefault();
-    setError('');
-
-    if (!summary) {
-      setError('Payment summary not available.');
-      return;
-    }
-
-    setBusy(true);
-    try {
-      await createStripePaymentIntent(orderId, 'card', token);
-      const result = await confirmCardPayment(orderId, card, token);
-      if (result?.paymentStatus === 'paid') {
-        navigate(`/order-success/${orderId}`);
-      } else {
-        setError(result?.message || 'Payment did not complete.');
-      }
-    } catch (err) {
-      setError(err instanceof ApiRequestError ? err.message : getApiErrorMessage(err, 'Payment failed.'));
-    } finally {
-      setBusy(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="checkout-page">
         <div className="checkout-container container">
           <p className="checkout-status">Loading payment details…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!summary || !clientSecret || !elementsOptions) {
+    return (
+      <div className="checkout-page">
+        <div className="checkout-container container">
+          <p className="checkout-alert checkout-alert--error">
+            {error || 'Payment session unavailable.'}
+          </p>
+          <Link to="/checkout" className="pay-now-btn">
+            Back to bag
+          </Link>
         </div>
       </div>
     );
@@ -121,7 +179,10 @@ const Payment = () => {
 
           <section className="form-section">
             <h2>Order payment</h2>
-            <p className="form-desc">Complete your payment in EUR with 21% BTW.</p>
+            <p className="form-desc">
+              Pay securely with Stripe. Card details are handled by Stripe and never touch our
+              servers.
+            </p>
 
             {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}
 
@@ -136,7 +197,9 @@ const Payment = () => {
                   <strong>{formatStorePrice(summary.subtotalAmount)}</strong>
                 </div>
                 <div className="summary-item">
-                  <span>{summary.vatLabel} ({summary.vatRatePercent}%)</span>
+                  <span>
+                    {summary.vatLabel} ({summary.vatRatePercent}%)
+                  </span>
                   <strong>{formatStorePrice(summary.vatAmount)}</strong>
                 </div>
                 <div className="summary-item">
@@ -150,64 +213,20 @@ const Payment = () => {
               </div>
             </div>
 
-            <form onSubmit={handlePay} className="payment-form">
-              <div className="form-row">
-                <label htmlFor="cardNumber">Kaartnummer</label>
-                <input
-                  id="cardNumber"
-                  type="text"
-                  value={card.cardNumber}
-                  maxLength={19}
-                  onChange={(e) => setCard({ ...card, cardNumber: e.target.value })}
-                  placeholder="4242 4242 4242 4242"
-                  required
+            {stripePromise ? (
+              <Elements stripe={stripePromise} options={elementsOptions}>
+                <PaymentCheckoutForm
+                  orderId={orderId}
+                  grandTotal={summary.grandTotalAmount}
+                  returnUrl={returnUrl}
+                  onError={setError}
                 />
-              </div>
-
-              <div className="form-grid">
-                <div className="form-row">
-                  <label htmlFor="expMonth">Maand</label>
-                  <input
-                    id="expMonth"
-                    type="number"
-                    min={1}
-                    max={12}
-                    value={card.expMonth}
-                    onChange={(e) => setCard({ ...card, expMonth: Number(e.target.value) })}
-                    required
-                  />
-                </div>
-                <div className="form-row">
-                  <label htmlFor="expYear">Jaar</label>
-                  <input
-                    id="expYear"
-                    type="number"
-                    min={new Date().getFullYear()}
-                    value={card.expYear}
-                    onChange={(e) => setCard({ ...card, expYear: Number(e.target.value) })}
-                    required
-                  />
-                </div>
-                <div className="form-row">
-                  <label htmlFor="cvv">CVV</label>
-                  <input
-                    id="cvv"
-                    type="text"
-                    maxLength={4}
-                    value={card.cvv}
-                    onChange={(e) => setCard({ ...card, cvv: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              <button type="button" className="pay-now-btn" onClick={handleTestCard} disabled={busy}>
-                Use test card
-              </button>
-              <button type="submit" className="pay-now-btn" disabled={busy}>
-                {busy ? 'Processing…' : `Pay ${formatStorePrice(summary.grandTotalAmount)}`}
-              </button>
-            </form>
+              </Elements>
+            ) : (
+              <p className="checkout-alert checkout-alert--error">
+                Stripe publishable key is missing.
+              </p>
+            )}
           </section>
         </div>
 
@@ -228,7 +247,9 @@ const Payment = () => {
             </div>
             <div className="summary-item">
               <span>VAT</span>
-              <strong>{storeConfig?.vatRatePercent}% {storeConfig?.vatLabel}</strong>
+              <strong>
+                {storeConfig?.vatRatePercent}% {storeConfig?.vatLabel}
+              </strong>
             </div>
           </div>
         </aside>
