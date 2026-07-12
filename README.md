@@ -1,16 +1,63 @@
-# React + Vite
+# Design Jewelry — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite storefront and admin panel for the Design Jewelry e-commerce platform.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
 
-## React Compiler
+Set `VITE_API_BASE_URL` in `.env` to your backend (default: `http://localhost:3000/api/v1`).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Production deployment (Vercel)
 
-## Expanding the ESLint configuration
+### 1. Connect GitHub
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Go to [vercel.com](https://vercel.com) → **Add New Project**
+2. Import `Hashimaftab/design-jewelry`
+3. Framework: **Vite**
+4. Build command: `npm run build`
+5. Output directory: `dist`
+
+[`vercel.json`](vercel.json) is included for React Router SPA rewrites.
+
+### 2. Environment variables
+
+In Vercel → **Settings → Environment Variables** (Production):
+
+| Variable | Example |
+|----------|---------|
+| `VITE_API_BASE_URL` | `https://api.yourdomain.com/api/v1` |
+| `VITE_API_ORIGIN` | `https://api.yourdomain.com` |
+| `VITE_FORCE_ABSOLUTE_UPLOADS` | `true` |
+
+See [`.env.production.example`](.env.production.example). Redeploy after changing env vars.
+
+### 3. Custom domain
+
+In Vercel → **Project → Domains**:
+
+- Add `yourdomain.com`
+- Optionally add `www.yourdomain.com` (redirect to apex)
+
+At your domain registrar, add the DNS records Vercel shows (typically):
+
+| Type | Name | Value |
+|------|------|-------|
+| A | `@` | Vercel IP(s) |
+| CNAME | `www` | `cname.vercel-dns.com` |
+
+### 4. Verify
+
+- Shop loads at `https://yourdomain.com`
+- Product pages and images load
+- Login, cart, checkout, and admin panel work
+
+## Backend
+
+The API lives in a separate repo. Deploy it first, then point this frontend at `https://api.yourdomain.com`.
+
+See the backend repo `DEPLOYMENT.md` for Railway/Render setup and DNS for the `api` subdomain.
