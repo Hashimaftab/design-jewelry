@@ -93,6 +93,7 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const [storeConfig, setStoreConfig] = useState(null);
+  const [paymentDiagnostics, setPaymentDiagnostics] = useState(null);
   const [summary, setSummary] = useState(null);
   const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState(true);
@@ -128,7 +129,9 @@ const Payment = () => {
           );
         }
 
-        const config = await getStoreConfig();
+        const configRes = await getStoreConfig();
+        const config = configRes?.store ?? configRes;
+        const diagnostics = configRes?.payments ?? null;
         const orderSummary = await getOrderPaymentSummary(orderId, token);
 
         if (orderSummary?.paymentStatus === 'paid') {
@@ -142,6 +145,7 @@ const Payment = () => {
         }
 
         setStoreConfig(config);
+        setPaymentDiagnostics(diagnostics);
         setSummary(orderSummary);
         setClientSecret(intent.clientSecret);
       } catch (err) {
@@ -201,6 +205,19 @@ const Payment = () => {
               Pay securely with iDEAL | Wero or card (Visa, Mastercard). Payment details are
               handled by Stripe and never touch our servers.
             </p>
+
+            {paymentDiagnostics && !paymentDiagnostics.idealTestIntentOk ? (
+              <p className="checkout-alert checkout-alert--error">
+                iDEAL is not available for this Stripe account
+                {paymentDiagnostics.stripeAccountCountry
+                  ? ` (country: ${paymentDiagnostics.stripeAccountCountry})`
+                  : ''}
+                . Use a Netherlands/EU Stripe business profile, or pay by card.
+                {paymentDiagnostics.idealTestError
+                  ? ` Stripe: ${paymentDiagnostics.idealTestError}`
+                  : ''}
+              </p>
+            ) : null}
 
             {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}
 

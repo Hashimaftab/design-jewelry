@@ -40,7 +40,10 @@ export const getStoreConfig = async () => {
   try {
     const res = await axiosInstance.get(PAYMENT_ROUTES.storeConfig);
     const data = extractResponseData(res);
-    return data?.store ?? data;
+    if (data?.store) {
+      return data;
+    }
+    return { store: data };
   } catch (error) {
     throw new ApiRequestError(error);
   }
