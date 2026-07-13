@@ -15,7 +15,7 @@ import { getApiErrorMessage } from '../utils/adminAuth';
 import './Checkout.css';
 
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
-const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
+const stripePromise = publishableKey ? loadStripe(publishableKey, { locale: 'nl' }) : null;
 
 function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
   const stripe = useStripe();
@@ -66,6 +66,16 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
           options={{
             layout: 'tabs',
             paymentMethodOrder: ['ideal', 'card'],
+            defaultValues: {
+              billingDetails: {
+                address: { country: 'NL' },
+              },
+            },
+            fields: {
+              billingDetails: {
+                address: { country: 'never' },
+              },
+            },
           }}
         />
       </div>
@@ -94,7 +104,10 @@ const Payment = () => {
   );
 
   const elementsOptions = useMemo(
-    () => (clientSecret ? { clientSecret, appearance: { theme: 'stripe' } } : null),
+    () =>
+      clientSecret
+        ? { clientSecret, locale: 'nl', appearance: { theme: 'stripe' } }
+        : null,
     [clientSecret],
   );
 
