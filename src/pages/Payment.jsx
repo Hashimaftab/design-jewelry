@@ -17,7 +17,7 @@ import './Checkout.css';
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = publishableKey ? loadStripe(publishableKey, { locale: 'nl' }) : null;
 
-function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
+function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, onError }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -37,7 +37,16 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
     try {
       const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
         elements,
-        confirmParams: { return_url: returnUrl },
+        confirmParams: {
+          return_url: returnUrl,
+          payment_method_data: {
+            billing_details: {
+              address: {
+                country: billingCountry,
+              },
+            },
+          },
+        },
         redirect: 'if_required',
       });
 
@@ -254,6 +263,7 @@ const Payment = () => {
                   orderId={orderId}
                   grandTotal={summary.grandTotalAmount}
                   returnUrl={returnUrl}
+                  billingCountry={storeConfig?.countryCode ?? 'NL'}
                   onError={setError}
                 />
               </Elements>
