@@ -20,6 +20,7 @@ function extractResponseData(res) {
   return raw?.data ?? raw;
 }
 
+/** @deprecated Local dev only — production uses Stripe.js Payment Element. Never send raw card data. */
 export const STRIPE_TEST_CARD = {
   cardNumber: '4242424242424242',
   cvv: '123',
@@ -39,7 +40,10 @@ export const getStoreConfig = async () => {
   try {
     const res = await axiosInstance.get(PAYMENT_ROUTES.storeConfig);
     const data = extractResponseData(res);
-    return data?.store ?? data;
+    if (data?.store) {
+      return data;
+    }
+    return { store: data };
   } catch (error) {
     throw new ApiRequestError(error);
   }
@@ -57,15 +61,11 @@ export const getOrderPaymentSummary = async (orderId, token) => {
   }
 };
 
-export const createStripePaymentIntent = async (
-  orderId,
-  paymentMethodType = 'card',
-  token,
-) => {
+export const createStripePaymentIntent = async (orderId, token) => {
   try {
     const res = await axiosInstance.post(
       PAYMENT_ROUTES.createIntent(orderId),
-      { paymentMethodType },
+      {},
       {
         headers: buildAuthHeaders(token),
       },
@@ -77,6 +77,10 @@ export const createStripePaymentIntent = async (
   }
 };
 
+/**
+ * @deprecated Local dev only. Production blocks this endpoint (410).
+ * Use Stripe.js Payment Element with clientSecret from createStripePaymentIntent.
+ */
 export const confirmCardPayment = async (orderId, card, token) => {
   try {
     const payload = {

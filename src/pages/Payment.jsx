@@ -15,9 +15,9 @@ import { getApiErrorMessage } from '../utils/adminAuth';
 import './Checkout.css';
 
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
-const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
+const stripePromise = publishableKey ? loadStripe(publishableKey, { locale: 'nl' }) : null;
 
-function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError, token }) {
+function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, onError }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -45,8 +45,15 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError, token })
 
       const result = await stripe.confirmPayment({
         elements,
-        confirmParams: { 
-          return_url: returnUrl 
+        confirmParams: {
+          return_url: returnUrl,
+          payment_method_data: {
+            billing_details: {
+              address: {
+                country: billingCountry,
+              },
+            },
+          },
         },
         redirect: 'if_required',
       });
@@ -107,7 +114,22 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError, token })
   return (
     <form onSubmit={handleSubmit} className="payment-form">
       <div className="payment-element-wrap">
-        <PaymentElement options={{ layout: 'tabs' }} />
+        <PaymentElement
+          options={{
+            layout: 'tabs',
+            paymentMethodOrder: ['ideal', 'card'],
+            defaultValues: {
+              billingDetails: {
+                address: { country: 'NL' },
+              },
+            },
+            fields: {
+              billingDetails: {
+                address: { country: 'never' },
+              },
+            },
+          }}
+        />
       </div>
       <button type="submit" className="pay-now-btn" disabled={!stripe || busy}>
         {busy ? 'Processing…' : `Pay ${formatStorePrice(grandTotal)}`}
@@ -123,6 +145,7 @@ const Payment = () => {
   const navigate = useNavigate();
 
   const [storeConfig, setStoreConfig] = useState(null);
+  const [paymentDiagnostics, setPaymentDiagnostics] = useState(null);
   const [summary, setSummary] = useState(null);
   const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState(true);
@@ -134,7 +157,10 @@ const Payment = () => {
   );
 
   const elementsOptions = useMemo(
-    () => (clientSecret ? { clientSecret, appearance: { theme: 'stripe' } } : null),
+    () =>
+      clientSecret
+        ? { clientSecret, locale: 'nl', appearance: { theme: 'stripe' } }
+        : null,
     [clientSecret],
   );
 
@@ -157,9 +183,9 @@ const Payment = () => {
           );
         }
 
-        const config = await getStoreConfig();
-        if (cancelled) return;
-
+        const configRes = await getStoreConfig();
+        const config = configRes?.store ?? configRes;
+        const diagnostics = configRes?.payments ?? null;
         const orderSummary = await getOrderPaymentSummary(orderId, token);
         if (cancelled) return;
 
@@ -168,9 +194,7 @@ const Payment = () => {
           return;
         }
 
-        const intent = await createStripePaymentIntent(orderId, 'card', token);
-        if (cancelled) return;
-
+        const intent = await createStripePaymentIntent(orderId, token);
         if (!intent?.clientSecret) {
           throw new Error(
             `Could not start payment session. Backend response: ${JSON.stringify(intent)}`,
@@ -178,6 +202,7 @@ const Payment = () => {
         }
 
         setStoreConfig(config);
+        setPaymentDiagnostics(diagnostics);
         setSummary(orderSummary);
         setClientSecret(intent.clientSecret);
       } catch (err) {
@@ -242,9 +267,22 @@ const Payment = () => {
           <section className="form-section">
             <h2>Order payment</h2>
             <p className="form-desc">
-              Pay securely with Stripe. Card details are handled by Stripe and never touch our
-              servers.
+              Pay securely with iDEAL | Wero or card (Visa, Mastercard). Payment details are
+              handled by Stripe and never touch our servers.
             </p>
+
+            {paymentDiagnostics && !paymentDiagnostics.idealTestIntentOk ? (
+              <p className="checkout-alert checkout-alert--error">
+                iDEAL is not available for this Stripe account
+                {paymentDiagnostics.stripeAccountCountry
+                  ? ` (country: ${paymentDiagnostics.stripeAccountCountry})`
+                  : ''}
+                . Use a Netherlands/EU Stripe business profile, or pay by card.
+                {paymentDiagnostics.idealTestError
+                  ? ` Stripe: ${paymentDiagnostics.idealTestError}`
+                  : ''}
+              </p>
+            ) : null}
 
             {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}
 
@@ -281,6 +319,7 @@ const Payment = () => {
                   orderId={orderId}
                   grandTotal={summary.grandTotalAmount}
                   returnUrl={returnUrl}
+                  billingCountry={storeConfig?.countryCode ?? 'NL'}
                   onError={setError}
                   token={token}
                 />

@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { getCategoryLabel } from '../constants/productCategories';
 import BrandLogo from '../components/BrandLogo';
+import { formatStorePrice } from '../api/payments.api';
 import './Checkout.css';
 
-const formatMoney = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+const formatMoney = formatStorePrice;
 
 const Checkout = () => {
   const { cart, loading, updateQuantity, removeItem, placeOrder } = useCart();
@@ -133,7 +133,7 @@ const Checkout = () => {
                         <div className="checkout-bag-item__body">
                           <h4>{p?.name ?? 'Product'}</h4>
                           {categoryLabel ? <p>{categoryLabel}</p> : null}
-                          <p className="checkout-bag-item__unit">{formatMoney(p?.price ?? 0)} each</p>
+                          <p className="checkout-bag-item__unit">{formatStorePrice(p?.price ?? 0)} each</p>
                           <div className="checkout-bag-item__actions">
                             <div className="qty-control">
                               <button
@@ -166,7 +166,7 @@ const Checkout = () => {
                             </button>
                           </div>
                         </div>
-                        <div className="checkout-bag-item__total">{formatMoney(line.lineTotal)}</div>
+                        <div className="checkout-bag-item__total">{formatStorePrice(line.lineTotal)}</div>
                       </motion.li>
                     );
                   })}
@@ -188,7 +188,7 @@ const Checkout = () => {
                   </span>
                 ) : (
                   <span className="btn-ready-state">
-                    <span>Proceed to Payment — {formatMoney(cart.subtotal)}</span>
+                    <span>Proceed to Payment — {formatStorePrice(cart.subtotal)}</span>
                     <span className="pay-btn-gleam" />
                   </span>
                 )}
@@ -221,7 +221,7 @@ const Checkout = () => {
                       <h4>{p?.name ?? 'Product'}</h4>
                       <p>{p?.categorySlug ? getCategoryLabel(p.categorySlug) : ''}</p>
                     </div>
-                    <div className="item-price">{formatMoney(line.lineTotal)}</div>
+                    <div className="item-price">{formatStorePrice(line.lineTotal)}</div>
                   </div>
                 );
               })}
@@ -230,15 +230,15 @@ const Checkout = () => {
             <div className="summary-totals">
               <div className="total-row">
                 <span>Subtotal ({cart.itemCount} items)</span>
-                <span>{formatMoney(cart.subtotal)}</span>
+                <span>{formatStorePrice(cart.subtotal)}</span>
               </div>
               <div className="total-row">
-                <span>Shipping</span>
-                <span>Complimentary</span>
+                <span>Verzending</span>
+                <span>Wordt berekend bij betaling</span>
               </div>
               <div className="total-row grand-total">
-                <span>Total</span>
-                <span>{formatMoney(cart.subtotal)}</span>
+                <span>Totaal</span>
+                <span>{formatStorePrice(cart.subtotal)}</span>
               </div>
             </div>
           </div>
