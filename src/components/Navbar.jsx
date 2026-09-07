@@ -48,7 +48,7 @@ const Navbar = () => {
   return (
     <header className={`navbar-header ${isHome ? 'on-home' : 'on-other'}`}>
       <nav className="navbar-container">
-        {/* Row 1: Logo (Left), Search (Center), Icons (Right) */}
+    
         <div className="container nav-top-row">
           <div className="nav-brand-section">
             <button
