@@ -21,6 +21,7 @@ import AdminProductList from './pages/admin/AdminProductList';
 import AdminProductForm from './pages/admin/AdminProductForm';
 import AdminProductView from './pages/admin/AdminProductView';
 import AdminOrders from './pages/admin/AdminOrders';
+import CartToast from './components/CartToast';
 import './App.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
   return (
     <>
+      <CartToast />
       {!hideNavbarFooter && <Navbar />}
       <main>
         <Routes>

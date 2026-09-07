@@ -85,49 +85,52 @@ const Account = () => {
 
       <div
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
-          backdropFilter: 'blur(10px)',
+          backgroundColor: '#ffffff',
           padding: '3rem',
-          border: '1px solid rgba(0,0,0,0.05)',
-          borderRadius: '8px',
+          border: '1px solid var(--border-gold)',
+          borderRadius: '14px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.05), var(--gold-glow-soft)',
           display: 'grid',
           gridTemplateColumns: 'minmax(200px, 1fr) 2fr',
-          gap: '2rem',
+          gap: '2.5rem',
         }}
       >
         <div
           style={{
             textAlign: 'center',
-            borderRight: '1px solid rgba(0,0,0,0.05)',
+            borderRight: '1px solid rgba(212, 175, 55, 0.15)',
             paddingRight: '2rem',
           }}
         >
           <div
             style={{
-              width: '100px',
-              height: '100px',
-              backgroundColor: 'var(--color-charcoal)',
-              color: 'white',
+              width: '96px',
+              height: '96px',
+              background: 'var(--gold-gradient)',
+              color: '#0b0c10',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '2rem',
+              fontSize: '2.2rem',
+              fontWeight: 700,
               margin: '0 auto 1.5rem',
+              boxShadow: '0 0 25px rgba(212, 175, 55, 0.4)',
             }}
           >
             {initial}
           </div>
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{displayName}</h2>
+          <h2 style={{ fontSize: '1.35rem', marginBottom: '0.5rem', color: '#111827', fontFamily: 'var(--font-serif)' }}>{displayName}</h2>
           <span
             style={{
-              fontSize: '0.65rem',
+              fontSize: '0.68rem',
               textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              padding: '4px 12px',
-              backgroundColor: 'var(--color-ivory)',
+              letterSpacing: '0.14em',
+              padding: '5px 16px',
+              backgroundColor: 'rgba(212, 175, 55, 0.1)',
               borderRadius: '20px',
-              border: '1px solid var(--color-gold)',
+              border: '1px solid var(--border-gold)',
+              color: 'var(--gold-light)',
             }}
           >
             {user?.role || 'customer'}
@@ -197,31 +200,45 @@ const Account = () => {
             </div>
           </div>
 
-          <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+          <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button
               onClick={handleLogout}
               style={{
-                padding: '0.75rem 2rem',
-                backgroundColor: 'var(--color-charcoal)',
-                color: 'white',
-                border: 'none',
+                padding: '0.85rem 2.2rem',
+                backgroundColor: '#211b17',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
+                fontWeight: 600,
                 textTransform: 'uppercase',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.14em',
+                boxShadow: '0 4px 18px rgba(0, 0, 0, 0.35)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#000000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#211b17';
               }}
             >
               Sign Out
             </button>
             <button
               style={{
-                padding: '0.75rem 2rem',
-                backgroundColor: 'transparent',
-                border: '1px solid var(--color-charcoal)',
+                padding: '0.8rem 2.2rem',
+                backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                border: '1px solid var(--border-gold)',
+                borderRadius: '6px',
+                color: 'var(--gold-light)',
                 cursor: 'pointer',
                 fontSize: '0.85rem',
+                fontWeight: 600,
                 textTransform: 'uppercase',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.12em',
+                transition: 'all 0.3s ease',
               }}
             >
               Edit Profile
@@ -230,49 +247,114 @@ const Account = () => {
         </div>
       </div>
 
-      <section style={{ marginTop: '3rem' }}>
+      <section style={{ marginTop: '3.5rem' }}>
         <h2
           style={{
             fontFamily: 'var(--font-serif)',
-            fontSize: '1.75rem',
-            marginBottom: '1.25rem',
+            fontSize: '1.85rem',
+            marginBottom: '1.5rem',
+            color: '#111827',
+            letterSpacing: '0.02em',
           }}
         >
-          Order history
+          Order History
         </h2>
         {ordersLoading ? (
           <p style={{ color: 'var(--color-text-secondary)' }}>Loading orders…</p>
         ) : ordersError ? (
-          <p style={{ color: '#a44', fontSize: '0.9rem' }}>{ordersError}</p>
+          <p style={{ color: '#dc2626', fontSize: '0.9rem' }}>{ordersError}</p>
         ) : orders.length === 0 ? (
-          <p style={{ color: 'var(--color-text-secondary)' }}>No orders yet.</p>
+          <div
+            style={{
+              padding: '2.5rem',
+              textAlign: 'center',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              border: '1px dashed var(--border-gold)',
+            }}
+          >
+            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>No orders yet.</p>
+            <button
+              onClick={() => navigate('/collections/necklaces')}
+              style={{
+                backgroundColor: '#211b17',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                padding: '0.8rem 1.8rem',
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                cursor: 'pointer',
+                boxShadow: '0 4px 18px rgba(0, 0, 0, 0.35)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#000000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#211b17';
+              }}
+            >
+              Explore Collections
+            </button>
+          </div>
         ) : (
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', padding: 0 }}>
             {orders.map((order) => (
               <li
                 key={order.id}
                 style={{
-                  background: 'rgba(255,255,255,0.5)',
-                  padding: '1.25rem 1.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(0,0,0,0.05)',
+                  background: '#ffffff',
+                  padding: '1.25rem 1.75rem',
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-gold)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '0.75rem',
+                  gap: '1rem',
+                  transition: 'transform 0.2s ease, border-color 0.2s ease',
                 }}
               >
                 <div>
-                  <strong style={{ fontSize: '0.9rem' }}>#{order.id.slice(0, 8)}</strong>
-                  <span style={{ marginLeft: '0.75rem', fontSize: '0.8rem', color: '#888' }}>
-                    {order.createdAt
-                      ? new Date(order.createdAt).toLocaleDateString()
-                      : ''}{' '}
-                    · {order.status}
+                  <strong style={{ fontSize: '0.95rem', color: 'var(--gold-primary)', letterSpacing: '0.05em' }}>
+                    #{order.id.slice(0, 8)}
+                  </strong>
+                  <span style={{ marginLeft: '1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}
+                  </span>
+                  <span
+                    style={{
+                      marginLeft: '0.75rem',
+                      fontSize: '0.65rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      padding: '3px 12px',
+                      borderRadius: '12px',
+                      backgroundColor:
+                        order.status === 'paid'
+                          ? 'rgba(16, 185, 129, 0.12)'
+                          : 'rgba(212, 175, 55, 0.12)',
+                      color:
+                        order.status === 'paid'
+                          ? '#059669'
+                          : 'var(--gold-primary)',
+                      border: `1px solid ${
+                        order.status === 'paid'
+                          ? 'rgba(16, 185, 129, 0.3)'
+                          : 'rgba(212, 175, 55, 0.3)'
+                      }`,
+                    }}
+                  >
+                    {order.status}
                   </span>
                 </div>
-                <span style={{ fontWeight: 500 }}>{formatMoney(order.totalAmount)}</span>
+                <span style={{ fontWeight: 600, fontSize: '1.15rem', color: 'var(--gold-primary)' }}>
+                  {formatMoney(order.totalAmount)}
+                </span>
               </li>
             ))}
           </ul>

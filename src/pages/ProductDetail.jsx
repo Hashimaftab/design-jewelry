@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import { getCatalogProduct } from '../api/catalog.api';
 import { isValidCategory, getCategoryLabel } from '../constants/productCategories';
 import { AuthContext } from '../context/AuthContext';
@@ -22,6 +22,7 @@ const ProductDetail = () => {
   const [error, setError] = useState('');
   const [bagMessage, setBagMessage] = useState('');
   const [addingToBag, setAddingToBag] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -95,8 +96,10 @@ const ProductDetail = () => {
     }
 
     setAddingToBag(true);
-    const result = await addToCart(product.id, quantity);
+    const result = await addToCart(product.id, quantity, product);
     if (result.success) {
+      setJustAdded(true);
+      setTimeout(() => setJustAdded(false), 2400);
       setBagMessage('Added to your bag.');
     } else {
       setBagMessage(result.message);
@@ -175,11 +178,28 @@ const ProductDetail = () => {
 
             <button
               type="button"
-              className="product-detail__cta"
+              className={`product-detail__cta ${justAdded ? 'product-detail__cta--added' : ''}`}
               disabled={!product.inStock || addingToBag}
               onClick={handleAddToBag}
             >
-              {addingToBag ? 'Adding…' : product.inStock ? 'Add to bag' : 'Out of stock'}
+              {addingToBag ? (
+                <span className="cta-loading-content">
+                  <span className="cta-gold-spinner" />
+                  <span>Adding to Bag…</span>
+                </span>
+              ) : justAdded ? (
+                <span className="cta-added-content">
+                  <Check size={18} className="cta-check-icon" />
+                  <span>Added to Bag</span>
+                </span>
+              ) : product.inStock ? (
+                <span className="cta-default-content">
+                  <span>Add to Bag</span>
+                  <span className="cta-btn-gleam" />
+                </span>
+              ) : (
+                'Out of stock'
+              )}
             </button>
 
             {token && product.inStock ? (

@@ -18,6 +18,12 @@ export const CartProvider = ({ children }) => {
   const { token } = useContext(AuthContext);
   const [cart, setCart] = useState(emptyCart);
   const [loading, setLoading] = useState(false);
+  const [cartBounceKey, setCartBounceKey] = useState(0);
+  const [cartToast, setCartToast] = useState(null);
+
+  const dismissToast = useCallback(() => {
+    setCartToast(null);
+  }, []);
 
   const refreshCart = useCallback(async () => {
     if (!token) {
@@ -45,11 +51,23 @@ export const CartProvider = ({ children }) => {
     refreshCart();
   }, [refreshCart]);
 
-  const addToCart = async (productId, quantity = 1) => {
+  const addToCart = async (productId, quantity = 1, productDetails = null) => {
     try {
       await addToCartApi({ productId, quantity });
       const next = await getCart();
       setCart(next);
+      setCartBounceKey((k) => k + 1);
+
+      // Find product details from newly updated items or fallback to provided details
+      const foundItem = next.items?.find((it) => it.productId === productId);
+      const toastPayload = {
+        name: productDetails?.name || foundItem?.product?.name || 'Jewelry Piece',
+        imageUrl: productDetails?.imageUrl || productDetails?.image || foundItem?.product?.imageUrl,
+        price: productDetails?.price || foundItem?.product?.price,
+        quantity,
+      };
+      setCartToast(toastPayload);
+
       return { success: true, cart: next };
     } catch (error) {
       return {
@@ -119,6 +137,9 @@ export const CartProvider = ({ children }) => {
       value={{
         cart,
         loading,
+        cartBounceKey,
+        cartToast,
+        dismissToast,
         refreshCart,
         addToCart,
         updateQuantity,

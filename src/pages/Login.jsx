@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import BrandLogo from '../components/BrandLogo';
 import './Auth.css';
 
 const Login = () => {
@@ -36,7 +37,12 @@ const Login = () => {
           <span>Return to Store</span>
         </Link>
         <div className="auth-header">
-          <h1 className="auth-logo">HUSAN</h1>
+          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <BrandLogo
+              variant="dark"
+              className="auth-logo-img"
+            />
+          </Link>
           <h2>Welcome Back</h2>
           <p>Sign in to access your curated collections and orders.</p>
         </div>

@@ -104,22 +104,30 @@ const OrderSuccess = () => {
     <div className="checkout-page">
       <div className="checkout-container container checkout-container--narrow">
         <div className="checkout-success">
-          <div className="checkout-success__icon">
-            <span>✓</span>
+          <div className="checkout-success__icon-wrap">
+            <div className="checkout-success__ring-pulse" aria-hidden="true" />
+            <div className="checkout-success__icon">
+              <svg className="success-svg" viewBox="0 0 52 52">
+                <circle className="success-svg__circle" cx="26" cy="26" r="24" fill="none" />
+                <path className="success-svg__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+              </svg>
+            </div>
           </div>
-          <h1>Payment successful</h1>
-          <p>
-            Thank you. Your order <strong>#{orderId?.slice(0, 8)}</strong> has been paid.
+          <h1>Order Confirmed</h1>
+          <p className="checkout-success__sub">
+            Thank you for choosing our boutique. Your bespoke order <strong>#{orderId?.slice(0, 8)}</strong> has been placed and is being prepared with utmost care.
           </p>
-          <p className="checkout-success__total">
-            Total: {formatStorePrice(summary.grandTotalAmount)}
-          </p>
+          <div className="checkout-success__total-badge">
+            <span>Total Paid</span>
+            <strong>{formatStorePrice(summary.grandTotalAmount)}</strong>
+          </div>
           <div className="checkout-success__actions">
             <Link to="/" className="pay-now-btn checkout-success__btn">
-              Continue shopping
+              <span>Continue Browsing</span>
+              <span className="pay-btn-gleam" />
             </Link>
             <Link to="/account" className="checkout-success__link">
-              View account
+              View Order History
             </Link>
           </div>
         </div>

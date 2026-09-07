@@ -1,7 +1,10 @@
 .auth-page {
   display: flex;
   min-height: 100vh;
-  background-color: var(--color-bg);
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
 }
 
 .auth-container {
@@ -9,9 +12,13 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4rem 10%;
-  max-width: 600px;
+  padding: 3.5rem 8%;
+  max-width: 560px;
   position: relative;
+  background: #ffffff;
+  border: 1px solid var(--border-gold);
+  border-radius: 16px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.06), var(--gold-glow-soft);
 }
 
 .auth-image {
@@ -29,46 +36,42 @@
 
 .auth-container .back-link {
   position: absolute;
-  top: 2rem;
-  left: 2rem;
+  top: 1.5rem;
+  left: 1.5rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   color: var(--color-text-secondary);
-  transition: color 0.3s;
+  transition: all 0.3s ease;
 }
 
 .auth-container .back-link:hover {
-  color: var(--color-charcoal);
+  color: var(--gold-light);
+  transform: translateX(-3px);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
 }
 
 .auth-header {
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
   text-align: center;
-}
-
-.auth-logo {
-  font-family: var(--font-serif);
-  font-size: 2.5rem;
-  letter-spacing: 0.2em;
-  margin-bottom: 2rem;
-  color: var(--color-charcoal);
 }
 
 .auth-header h2 {
   font-family: var(--font-serif);
-  font-size: 2rem;
+  font-size: 2.1rem;
   margin-bottom: 0.75rem;
-  font-style: italic;
-  font-weight: 400;
+  font-weight: 500;
+  color: #111827;
+  letter-spacing: 0.02em;
 }
 
 .auth-header p {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .auth-form {
@@ -97,50 +100,64 @@
 
 .input-group label {
   font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-charcoal);
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: 0.02em;
 }
 
 .forgot-password {
   font-size: 0.8rem;
-  color: var(--color-text-secondary);
+  color: var(--gold-primary);
   text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+  color: var(--gold-light);
 }
 
 .form-input {
   width: 100%;
   padding: 1rem 1.25rem;
-  border: 1px solid rgba(54, 69, 79, 0.15);
-  border-radius: 4px;
+  border: 1px solid var(--border-gold);
+  border-radius: 6px;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   outline: none;
-  background-color: transparent;
-  transition: border-color 0.3s;
+  background-color: #ffffff;
+  color: #111827;
+  transition: all 0.3s ease;
 }
 
 .form-input:focus {
-  border-color: var(--color-charcoal);
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
 }
 
 .auth-btn {
   width: 100%;
-  padding: 1.25rem;
-  background-color: var(--color-charcoal);
-  color: #fff;
-  font-size: 0.9rem;
+  padding: 1.15rem;
+  background-color: #211b17;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   border-radius: 4px;
   cursor: pointer;
-  border: none;
-  transition: background-color 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
   margin-top: 1rem;
 }
 
 .auth-btn:hover {
-  background-color: var(--color-gold);
+  background-color: #000000;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
 }
 
 .auth-footer {
@@ -151,11 +168,13 @@
 }
 
 .auth-link {
-  color: var(--color-charcoal);
+  color: var(--gold-primary);
   font-weight: 600;
   margin-left: 0.5rem;
+  transition: all 0.3s ease;
 }
 
 .auth-link:hover {
-  color: var(--color-gold);
+  color: var(--gold-light);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
 }

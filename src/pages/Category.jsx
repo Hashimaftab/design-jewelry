@@ -10,9 +10,9 @@ const PAGE_SIZE = 12;
 
 const CATEGORY_META = {
   necklaces: { title: 'Timeless Necklaces', bg: '/hero_bg.png' },
-  earrings: { title: 'Brilliant Studs', bg: '/shop_look.png' },
+  earrings: { title: 'Brilliant Studs', bg: '/cat_earrings.png' },
   rings: { title: 'Signature Rings', bg: '/gift_love.png' },
-  bracelets: { title: 'Refined Bracelets', bg: '/shop_look.png' },
+  bracelets: { title: 'Refined Bracelets', bg: '/cat_bracelets.png' },
 };
 
 const Category = () => {

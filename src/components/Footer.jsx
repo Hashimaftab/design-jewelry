@@ -1,3 +1,4 @@
+import BrandLogo from './BrandLogo';
 import './Footer.css';
 
 const Footer = () => {
@@ -5,7 +6,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer-brand">
-          <h2 className="footer-logo">HUSAN</h2>
+          <BrandLogo variant="dark" className="footer-logo-img" />
           <p>Elegance in every detail. Fine luxury jewelry crafted for the modern aesthetic.</p>
         </div>
         <div className="footer-links-group">

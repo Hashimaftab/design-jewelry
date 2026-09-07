@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Minus, Plus, Trash2, ShieldCheck, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { getCategoryLabel } from '../constants/productCategories';
+import BrandLogo from '../components/BrandLogo';
 import './Checkout.css';
 
 const formatMoney = (n) =>
@@ -53,83 +54,123 @@ const Checkout = () => {
           <header className="checkout-header">
             <Link to="/" className="back-link">
               <ArrowLeft size={16} />
-              <span>Return to Store</span>
+              <span>Return to Boutique</span>
             </Link>
-            <h1 className="checkout-logo">HUSAN</h1>
+            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <BrandLogo
+                variant="dark"
+                className="auth-logo-img"
+                style={{ height: '56px', margin: '0 auto' }}
+              />
+            </Link>
           </header>
 
+          {/* Luxury Checkout Stepper */}
+          <div className="checkout-stepper">
+            <div className="checkout-step checkout-step--active">
+              <div className="checkout-step__circle">1</div>
+              <span className="checkout-step__label">Shopping Bag</span>
+            </div>
+            <div className="checkout-step__line checkout-step__line--gold" />
+            <div className="checkout-step">
+              <div className="checkout-step__circle">2</div>
+              <span className="checkout-step__label">Payment</span>
+            </div>
+            <div className="checkout-step__line" />
+            <div className="checkout-step">
+              <div className="checkout-step__circle">3</div>
+              <span className="checkout-step__label">Confirmation</span>
+            </div>
+          </div>
+
           <section className="form-section">
-            <h2>Your bag</h2>
-            <p className="form-desc">Review items before placing your order.</p>
+            <div className="section-heading-wrap">
+              <h2>Your Selection</h2>
+              <span className="luxury-tag">
+                <Sparkles size={13} />
+                <span>Complimentary Insured Delivery</span>
+              </span>
+            </div>
+            <p className="form-desc">Review your curated pieces before completing your order.</p>
 
             {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}
 
             {loading ? (
-              <p className="checkout-status">Loading your bag…</p>
+              <p className="checkout-status">Preparing your jewelry bag…</p>
             ) : isEmpty ? (
               <div className="checkout-empty">
-                <p>Your bag is empty.</p>
+                <p>Your shopping bag is currently empty.</p>
                 <Link to="/collections/necklaces" className="checkout-empty__link">
-                  Browse collections
+                  Explore Collections
                 </Link>
               </div>
             ) : (
               <ul className="checkout-bag-list">
-                {cart.items.map((line) => {
-                  const p = line.product;
-                  const categoryLabel = p?.categorySlug
-                    ? getCategoryLabel(p.categorySlug)
-                    : p?.category ?? '';
-                  const disabled = busyId === line.productId;
+                <AnimatePresence mode="popLayout">
+                  {cart.items.map((line, idx) => {
+                    const p = line.product;
+                    const categoryLabel = p?.categorySlug
+                      ? getCategoryLabel(p.categorySlug)
+                      : p?.category ?? '';
+                    const disabled = busyId === line.productId;
 
-                  return (
-                    <li key={line.productId} className="checkout-bag-item">
-                      <div className="checkout-bag-item__img media-frame media-frame--thumb">
-                        {p?.imageUrl ? (
-                          <img src={p.imageUrl} alt={p.name} />
-                        ) : (
-                          <div className="media-frame__placeholder" aria-hidden />
-                        )}
-                      </div>
-                      <div className="checkout-bag-item__body">
-                        <h4>{p?.name ?? 'Product'}</h4>
-                        {categoryLabel ? <p>{categoryLabel}</p> : null}
-                        <p className="checkout-bag-item__unit">{formatMoney(p?.price ?? 0)} each</p>
-                        <div className="checkout-bag-item__actions">
-                          <div className="qty-control">
+                    return (
+                      <motion.li
+                        key={line.productId}
+                        className="checkout-bag-item"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.25 } }}
+                        transition={{ duration: 0.35, delay: idx * 0.05 }}
+                      >
+                        <div className="checkout-bag-item__img media-frame media-frame--thumb">
+                          {p?.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name} />
+                          ) : (
+                            <div className="media-frame__placeholder" aria-hidden />
+                          )}
+                        </div>
+                        <div className="checkout-bag-item__body">
+                          <h4>{p?.name ?? 'Product'}</h4>
+                          {categoryLabel ? <p>{categoryLabel}</p> : null}
+                          <p className="checkout-bag-item__unit">{formatMoney(p?.price ?? 0)} each</p>
+                          <div className="checkout-bag-item__actions">
+                            <div className="qty-control">
+                              <button
+                                type="button"
+                                aria-label="Decrease quantity"
+                                disabled={disabled || line.quantity <= 1}
+                                onClick={() => handleQtyChange(line.productId, line.quantity - 1)}
+                              >
+                                <Minus size={13} />
+                              </button>
+                              <span>{line.quantity}</span>
+                              <button
+                                type="button"
+                                aria-label="Increase quantity"
+                                disabled={disabled}
+                                onClick={() => handleQtyChange(line.productId, line.quantity + 1)}
+                              >
+                                <Plus size={13} />
+                              </button>
+                            </div>
                             <button
                               type="button"
-                              aria-label="Decrease quantity"
-                              disabled={disabled || line.quantity <= 1}
-                              onClick={() => handleQtyChange(line.productId, line.quantity - 1)}
-                            >
-                              <Minus size={14} />
-                            </button>
-                            <span>{line.quantity}</span>
-                            <button
-                              type="button"
-                              aria-label="Increase quantity"
+                              className="checkout-bag-item__remove"
                               disabled={disabled}
-                              onClick={() => handleQtyChange(line.productId, line.quantity + 1)}
+                              onClick={() => handleRemove(line.productId)}
+                              aria-label="Remove item"
                             >
-                              <Plus size={14} />
+                              <Trash2 size={15} />
+                              <span className="remove-text">Remove</span>
                             </button>
                           </div>
-                          <button
-                            type="button"
-                            className="checkout-bag-item__remove"
-                            disabled={disabled}
-                            onClick={() => handleRemove(line.productId)}
-                            aria-label="Remove item"
-                          >
-                            <Trash2 size={16} />
-                          </button>
                         </div>
-                      </div>
-                      <div className="checkout-bag-item__total">{formatMoney(line.lineTotal)}</div>
-                    </li>
-                  );
-                })}
+                        <div className="checkout-bag-item__total">{formatMoney(line.lineTotal)}</div>
+                      </motion.li>
+                    );
+                  })}
+                </AnimatePresence>
               </ul>
             )}
 
@@ -140,9 +181,24 @@ const Checkout = () => {
                 disabled={checkoutBusy || loading}
                 onClick={handlePlaceOrder}
               >
-                {checkoutBusy ? 'Placing order…' : `Place order — ${formatMoney(cart.subtotal)}`}
+                {checkoutBusy ? (
+                  <span className="btn-loading-state">
+                    <span className="cta-gold-spinner" />
+                    <span>Initiating Checkout…</span>
+                  </span>
+                ) : (
+                  <span className="btn-ready-state">
+                    <span>Proceed to Payment — {formatMoney(cart.subtotal)}</span>
+                    <span className="pay-btn-gleam" />
+                  </span>
+                )}
               </button>
             ) : null}
+
+            <div className="checkout-security-badge">
+              <ShieldCheck size={16} />
+              <span>256-Bit Encrypted Secure Checkout with Stripe</span>
+            </div>
           </section>
         </div>
 

@@ -17,7 +17,7 @@ import './Checkout.css';
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
-function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
+function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError, token }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -32,28 +32,73 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, onError }) {
       return;
     }
 
+    if (busy) {
+      return; // Prevent double submission
+    }
+
     setBusy(true);
 
     try {
-      const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+      // Log for debugging
+      console.log('Starting payment confirmation for order:', orderId);
+      console.log('Return URL:', returnUrl);
+
+      const result = await stripe.confirmPayment({
         elements,
-        confirmParams: { return_url: returnUrl },
+        confirmParams: { 
+          return_url: returnUrl 
+        },
         redirect: 'if_required',
       });
 
-      if (confirmError) {
-        onError(confirmError.message || 'Payment failed.');
+      console.log('Payment result:', result);
+
+      if (result?.error) {
+        console.error('Stripe payment error:', result.error);
+        const errorMessage = result.error.message || result.error.code || 'Payment failed';
+        onError(`Payment Error: ${errorMessage}`);
         return;
       }
 
-      if (paymentIntent?.status === 'succeeded') {
+      const paymentIntent = result?.paymentIntent;
+
+      if (!paymentIntent) {
+        onError('No payment response from Stripe. Please try again.');
+        return;
+      }
+
+      console.log('Payment intent status:', paymentIntent.status);
+
+      if (paymentIntent.status === 'succeeded') {
+        console.log('Payment succeeded, redirecting to success page');
         navigate(`/order-success/${orderId}`, { replace: true });
         return;
       }
 
-      onError('Payment did not complete. Please try again.');
+      if (paymentIntent.status === 'processing') {
+        console.log('Payment is processing');
+        onError('Payment is processing. Please wait...');
+        // Optionally redirect after a delay
+        setTimeout(() => {
+          navigate(`/order-success/${orderId}`, { replace: true });
+        }, 2000);
+        return;
+      }
+
+      if (paymentIntent.status === 'requires_payment_method') {
+        onError('Please provide valid payment details');
+        return;
+      }
+
+      if (paymentIntent.status === 'requires_action') {
+        onError('Payment requires authentication. Please complete the verification.');
+        return;
+      }
+
+      onError(`Payment status: ${paymentIntent.status}. Please contact support if this persists.`);
     } catch (err) {
-      onError(err?.message || 'Payment failed.');
+      console.error('Payment exception:', err);
+      onError(err?.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setBusy(false);
     }
@@ -99,6 +144,8 @@ const Payment = () => {
       return;
     }
 
+    let cancelled = false;
+
     const load = async () => {
       setLoading(true);
       setError('');
@@ -111,7 +158,10 @@ const Payment = () => {
         }
 
         const config = await getStoreConfig();
+        if (cancelled) return;
+
         const orderSummary = await getOrderPaymentSummary(orderId, token);
+        if (cancelled) return;
 
         if (orderSummary?.paymentStatus === 'paid') {
           navigate(`/order-success/${orderId}`, { replace: true });
@@ -119,25 +169,37 @@ const Payment = () => {
         }
 
         const intent = await createStripePaymentIntent(orderId, 'card', token);
+        if (cancelled) return;
+
         if (!intent?.clientSecret) {
-          throw new Error('Could not start payment session.');
+          throw new Error(
+            `Could not start payment session. Backend response: ${JSON.stringify(intent)}`,
+          );
         }
 
         setStoreConfig(config);
         setSummary(orderSummary);
         setClientSecret(intent.clientSecret);
       } catch (err) {
-        setError(
+        if (cancelled) return;
+        console.error('Payment setup error:', err);
+        const message =
           err instanceof ApiRequestError
-            ? err.message
-            : getApiErrorMessage(err, 'Could not load payment details.'),
-        );
+            ? `API Error (${err.status}): ${err.message}`
+            : getApiErrorMessage(err, 'Could not load payment details.');
+        setError(message);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [token, orderId, navigate, location.pathname]);
 
   if (loading) {
@@ -220,6 +282,7 @@ const Payment = () => {
                   grandTotal={summary.grandTotalAmount}
                   returnUrl={returnUrl}
                   onError={setError}
+                  token={token}
                 />
               </Elements>
             ) : (

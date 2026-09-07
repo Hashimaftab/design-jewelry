@@ -1,37 +1,49 @@
 .product-detail {
-  padding: 7rem 0 4rem;
-  min-height: 60vh;
+  padding: 8rem 0 4rem;
+  min-height: 65vh;
 }
 
 .product-detail__inner {
-  max-width: 1100px;
+  max-width: 1160px;
 }
 
 .product-detail__back {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--color-text-secondary);
-  margin-bottom: 2rem;
+  margin-bottom: 2.2rem;
+  transition: all 0.3s ease;
 }
 
 .product-detail__back:hover {
-  color: var(--color-gold);
+  color: var(--gold-light);
+  transform: translateX(-3px);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
 }
 
 .product-detail__layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 4.5rem;
   align-items: start;
 }
 
 .product-detail__media {
-  border: 1px solid rgba(54, 69, 79, 0.08);
-  background: var(--color-surface);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(212, 175, 55, 0.15);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.product-detail__media:hover {
+  border-color: var(--border-gold-hover);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.1), var(--gold-glow);
 }
 
 .product-detail__image-placeholder {
@@ -40,61 +52,76 @@
   justify-content: center;
   color: var(--color-text-secondary);
   font-size: 0.85rem;
+  min-height: 380px;
 }
 
 .product-detail__category {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--color-text-secondary);
+  letter-spacing: 0.18em;
+  color: var(--gold-primary);
   margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .product-detail__title {
   font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(2.2rem, 4vw, 3rem);
   font-weight: 400;
+  color: #111827;
   margin-bottom: 1rem;
   line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .product-detail__price {
-  font-size: 1.35rem;
-  letter-spacing: 0.05em;
-  margin-bottom: 1.5rem;
-  color: var(--color-charcoal);
+  font-size: 1.75rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.75rem;
+  color: var(--gold-primary);
+  font-weight: 600;
 }
 
 .product-detail__stock {
-  padding: 1rem 1.25rem;
-  border-radius: 4px;
+  padding: 1.1rem 1.4rem;
+  border-radius: 8px;
   margin-bottom: 2rem;
-  border: 1px solid rgba(54, 69, 79, 0.1);
-  background: var(--color-ivory);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .product-detail__stock--in {
-  border-color: rgba(212, 175, 55, 0.35);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.08);
+}
+
+.product-detail__stock--in .product-detail__stock-value {
+  color: #059669;
+  font-weight: 500;
 }
 
 .product-detail__stock--out {
-  border-color: rgba(180, 80, 80, 0.25);
-  background: rgba(180, 80, 80, 0.06);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.product-detail__stock--out .product-detail__stock-value {
+  color: #dc2626;
 }
 
 .product-detail__stock-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--color-text-secondary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
 .product-detail__stock-value {
   display: block;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .product-detail__stock-qty {
@@ -106,88 +133,160 @@
 
 .product-detail__description h2 {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   margin-bottom: 0.75rem;
-  font-weight: 400;
+  color: #111827;
+  letter-spacing: 0.02em;
 }
 
 .product-detail__description p {
-  line-height: 1.7;
+  line-height: 1.8;
   color: var(--color-text-secondary);
+  font-size: 0.98rem;
 }
 
 .product-detail__purchase {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  max-width: 120px;
+  max-width: 140px;
 }
 
 .product-detail__qty-label {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--color-text-secondary);
 }
 
 .product-detail__qty {
   width: 100%;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid rgba(54, 69, 79, 0.15);
-  border-radius: 4px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 6px;
   font-family: inherit;
   font-size: 1rem;
-  background: var(--color-surface);
+  background: #ffffff;
+  color: #111827;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.product-detail__qty:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
 }
 
 .product-detail__bag-msg {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #a44;
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
 }
 
 .product-detail__bag-msg--ok {
-  color: var(--color-charcoal);
+  color: var(--gold-primary);
+  font-weight: 500;
 }
 
 .product-detail__checkout-link {
   display: inline-block;
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid currentColor;
-}
-
-.product-detail__checkout-link:hover {
-  color: var(--color-gold);
-}
-
-.product-detail__cta {
   margin-top: 1.25rem;
-  width: 100%;
-  max-width: 320px;
-  padding: 1rem 2rem;
-  background: var(--color-charcoal);
-  color: #fff;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  border: none;
+  color: var(--gold-primary);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: all 0.3s ease;
+}
+
+.product-detail__checkout-link:hover {
+  color: #111827;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+/* Luxurious Animated CTA Button */
+.product-detail__cta {
+  position: relative;
+  margin-top: 1.75rem;
+  width: 100%;
+  max-width: 340px;
+  padding: 1.2rem 2.4rem;
+  background: #211b17;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
 }
 
 .product-detail__cta:hover:not(:disabled) {
-  background: var(--color-gold);
-  color: var(--color-charcoal);
+  background: #000000;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.55);
+  transform: translateY(-2px);
 }
 
 .product-detail__cta:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+.product-detail__cta--added {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 25px rgba(16, 185, 129, 0.45) !important;
+  transform: scale(1.02);
+}
+
+.cta-default-content,
+.cta-added-content,
+.cta-loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.cta-btn-gleam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--gold-shimmer);
+  animation: luxuryGoldSweep 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cta-check-icon {
+  animation: cartBounce 0.5s ease;
+}
+
+.cta-gold-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(11, 12, 16, 0.3);
+  border-top-color: #0b0c10;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .product-detail__status,
@@ -197,14 +296,14 @@
 }
 
 .product-detail__error {
-  color: #a44;
+  color: #f87171;
   margin-bottom: 1rem;
 }
 
 @media (max-width: 768px) {
   .product-detail__layout {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
   }
 
   .product-detail__cta {

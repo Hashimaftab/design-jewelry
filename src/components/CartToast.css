@@ -1,0 +1,169 @@
+.cart-toast-container {
+  position: fixed;
+  top: 90px;
+  right: 24px;
+  z-index: 9999;
+  max-width: 380px;
+  width: calc(100vw - 48px);
+  pointer-events: auto;
+  animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cart-toast {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.12), 0 0 25px rgba(212, 175, 55, 0.15);
+}
+
+.cart-toast__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.cart-toast__badge {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--gold-dark);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.cart-toast__sparkle {
+  color: var(--gold-primary);
+  animation: floatSlow 2.5s ease-in-out infinite;
+}
+
+.cart-toast__close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.cart-toast__close:hover {
+  color: #111827;
+  transform: scale(1.15);
+}
+
+.cart-toast__body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.cart-toast__thumb {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-gold);
+  background: #fdfbf7;
+  flex-shrink: 0;
+}
+
+.cart-toast__thumb-placeholder {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 8px;
+  color: var(--gold-primary);
+  flex-shrink: 0;
+}
+
+.cart-toast__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cart-toast__name {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.cart-toast__price {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold-primary);
+}
+
+.cart-toast__actions {
+  width: 100%;
+}
+
+.cart-toast__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: #211b17;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
+}
+
+.cart-toast__btn:hover {
+  background: #000000;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+  transform: translateY(-1px);
+}
+
+.cart-toast__btn-gleam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: var(--gold-shimmer);
+  animation: luxuryGoldSweep 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .cart-toast-container {
+    top: 75px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
