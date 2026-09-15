@@ -56,13 +56,31 @@ function pickRawImageUrl(p) {
   return p.imageUrl ?? p.image_url ?? p.image ?? p.thumbnail ?? '';
 }
 
+function pickRawImages(p) {
+  if (Array.isArray(p.images) && p.images.length > 0) {
+    return p.images;
+  }
+  if (typeof p.images === 'string') {
+    try {
+      const parsed = JSON.parse(p.images);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {
+      // ignore
+    }
+  }
+  const single = pickRawImageUrl(p);
+  return single ? [single] : [];
+}
+
 /**
  * Normalize API product for admin UI.
  */
 export function normalizeProduct(p) {
   if (!p || typeof p !== 'object') return null;
 
-  const imageUrl = resolveImageUrl(pickRawImageUrl(p));
+  const rawImages = pickRawImages(p);
+  const images = rawImages.map(resolveImageUrl).filter(Boolean);
+  const imageUrl = images[0] || resolveImageUrl(pickRawImageUrl(p));
   const category = p.category ?? '';
   const categorySlug = CATEGORY_DB_TO_SLUG[category] ?? p.categorySlug ?? category;
 
@@ -75,6 +93,7 @@ export function normalizeProduct(p) {
     price: Number(p.price) || 0,
     imageUrl,
     image: imageUrl,
+    images,
     quantity: Number(p.quantity) || 0,
     isAvailable: Boolean(p.isAvailable ?? p.is_available),
     inStock: Boolean(p.inStock ?? p.in_stock),

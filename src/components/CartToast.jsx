@@ -1,11 +1,10 @@
+import { formatStorePrice as formatMoney } from '../utils/currency';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, X, ShoppingBag } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContextValue';
 import './CartToast.css';
 
-const formatMoney = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
 const CartToast = () => {
   const { cartToast, dismissToast } = useCart();

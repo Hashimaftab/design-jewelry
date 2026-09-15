@@ -1,5 +1,6 @@
+import { formatStorePrice as formatMoney } from '../utils/currency';
 import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContextValue';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Shield, RefreshCcw, BadgeCheck } from 'lucide-react';
 import { getUserDisplayName } from '../api/authHelpers';
@@ -7,15 +8,13 @@ import { listMyOrders } from '../api/cart.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
 
 const Account = () => {
-  const { user, logout, refreshUser } = useContext(AuthContext);
+  const { user, logout, refreshUser, sessionError } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
 
-  const formatMoney = (n) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +53,8 @@ const Account = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '8rem 2rem', minHeight: '70vh' }}>
+    <div className="container account-page">
+      {sessionError && <p className="checkout-alert checkout-alert--error" role="alert">{sessionError}</p>}
       <div
         style={{
           display: 'flex',
@@ -83,23 +83,20 @@ const Account = () => {
         </button>
       </div>
 
-      <div
+      <div className="account-profile"
         style={{
           backgroundColor: '#ffffff',
-          padding: '3rem',
           border: '1px solid var(--border-gold)',
           borderRadius: '14px',
           boxShadow: '0 10px 30px rgba(0, 0, 0, 0.05), var(--gold-glow-soft)',
           display: 'grid',
-          gridTemplateColumns: 'minmax(200px, 1fr) 2fr',
+          
           gap: '2.5rem',
         }}
       >
-        <div
+        <div className="account-identity"
           style={{
             textAlign: 'center',
-            borderRight: '1px solid rgba(212, 175, 55, 0.15)',
-            paddingRight: '2rem',
           }}
         >
           <div
@@ -321,7 +318,7 @@ const Account = () => {
               >
                 <div>
                   <strong style={{ fontSize: '0.95rem', color: 'var(--gold-primary)', letterSpacing: '0.05em' }}>
-                    #{order.id.slice(0, 8)}
+                    #{String(order.id ?? '').slice(0, 8)}
                   </strong>
                   <span style={{ marginLeft: '1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}

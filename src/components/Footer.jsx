@@ -15,8 +15,8 @@ const Footer = () => {
             <ul>
               <li><a href="/collections/necklaces">Necklaces</a></li>
               <li><a href="/collections/earrings">Earrings</a></li>
-              <li><a href="#">Bracelets</a></li>
-              <li><a href="#">Rings</a></li>
+              <li><a href="/collections/bracelets">Bracelets</a></li>
+              <li><a href="/collections/rings">Rings</a></li>
             </ul>
           </div>
           <div className="footer-col">

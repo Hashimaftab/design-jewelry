@@ -400,3 +400,213 @@
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
+/* Multi-image upload section (up to 4 images) */
+.product-upload-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.product-upload-section__hint-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(212, 175, 55, 0.15);
+  color: #8c6d1f;
+}
+
+.product-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+.product-upload-tile {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid rgba(54, 69, 79, 0.14);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-upload-tile:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.12);
+}
+
+.product-upload-tile--primary {
+  border-color: var(--color-gold, #d4af37);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.35);
+}
+
+.product-upload-tile--hover {
+  border-color: rgba(54, 69, 79, 0.35);
+}
+
+.product-upload-tile__thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0.4rem;
+  background: #fafaf7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-upload-tile__thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
+.product-upload-tile__remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #36454f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.product-upload-tile__remove:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+.product-upload-tile__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.product-upload-tile__role {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-charcoal, #36454f);
+}
+
+.product-upload-tile--primary .product-upload-tile__role {
+  color: #a67c00;
+}
+
+.product-upload-tile__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.product-upload-tile__nav-btn {
+  background: none;
+  border: none;
+  padding: 0.15rem;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #747f87;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.product-upload-tile__nav-btn:hover:not(:disabled) {
+  color: #111827;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.product-upload-tile__nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.product-upload-add-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 140px;
+  aspect-ratio: 1;
+  background: #fafaf7;
+  border: 2px dashed rgba(54, 69, 79, 0.25);
+  border-radius: 6px;
+  color: var(--color-charcoal, #36454f);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.product-upload-add-tile:hover {
+  border-color: var(--color-gold, #d4af37);
+  background: #ffffff;
+  color: var(--color-gold, #d4af37);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+}
+
+.product-upload-add-tile__text {
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.product-upload-add-tile__count {
+  font-size: 0.68rem;
+  color: #747f87;
+}
+
+/* Admin Product View Gallery */
+.admin-product-view__gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.admin-product-view__gallery-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-product-view__gallery-role {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #747f87;
+}
+
+.admin-product-view__gallery-item:first-child .admin-product-view__gallery-role {
+  color: #a67c00;
+}

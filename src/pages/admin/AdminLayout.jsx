@@ -12,10 +12,9 @@ import {
   Circle,
   Link2,
 } from 'lucide-react';
-import { AdminAuthContext } from '../../context/AdminAuthContext';
+import { AdminAuthContext } from '../../context/AdminAuthContextValue';
 import { getUserDisplayName } from '../../api/authHelpers';
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
-import './AdminLayout.css';
 
 const categoryIcon = {
   necklaces: Gem,

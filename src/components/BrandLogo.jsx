@@ -123,8 +123,8 @@ function processLogo() {
         cache.light = lightCanvas.toDataURL('image/png');
 
         resolve(cache);
-      } catch (err) {
-        console.error('Failed to process brand logo variants:', err);
+      } catch {
+        // Use the original image if canvas processing is unavailable.
         resolve(cache);
       }
     };
@@ -152,12 +152,6 @@ export default function BrandLogo({
   const [isProcessed, setIsProcessed] = useState(Boolean(cache[targetVariant]));
 
   useEffect(() => {
-    if (cache[targetVariant]) {
-      setSrc(cache[targetVariant]);
-      setIsProcessed(true);
-      return;
-    }
-
     processLogo().then((res) => {
       if (res[targetVariant]) {
         setSrc(res[targetVariant]);

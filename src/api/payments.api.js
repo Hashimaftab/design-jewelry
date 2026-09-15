@@ -28,13 +28,7 @@ export const STRIPE_TEST_CARD = {
   expYear: 2030,
 };
 
-export const formatStorePrice = (amount, locale = 'nl-NL', currency = 'EUR') => {
-  const value = Number(amount) || 0;
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(value);
-};
+export { formatStorePrice } from '../utils/currency';
 
 export const getStoreConfig = async () => {
   try {

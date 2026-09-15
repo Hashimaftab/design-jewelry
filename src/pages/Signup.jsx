@@ -1,9 +1,8 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContextValue';
 import BrandLogo from '../components/BrandLogo';
-import './Auth.css';
 
 const Signup = () => {
   const { register } = useContext(AuthContext);

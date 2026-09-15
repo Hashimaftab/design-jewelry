@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams, Navigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { listCatalogProducts } from '../api/catalog.api';
 import { isValidCategory, getCategoryLabel } from '../constants/productCategories';
 import { getApiErrorMessage } from '../utils/adminAuth';
-import './Category.css';
 
 const PAGE_SIZE = 12;
 
@@ -15,8 +14,7 @@ const CATEGORY_META = {
   bracelets: { title: 'Refined Bracelets', bg: '/cat_bracelets.png' },
 };
 
-const Category = () => {
-  const { category } = useParams();
+const CategoryCollection = ({ category, search }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,33 +22,35 @@ const Category = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [inStockOnly, setInStockOnly] = useState(false);
 
-  const load = useCallback(async () => {
-    if (!isValidCategory(category)) return;
-    setLoading(true);
-    setError('');
-    try {
-      const result = await listCatalogProducts(category, {
-        page,
-        limit: PAGE_SIZE,
-        inStockOnly,
-      });
-      setProducts(result.products);
-      setTotalPages(result.totalPages);
-    } catch (e) {
-      setError(getApiErrorMessage(e, 'Could not load products.'));
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [category, page, inStockOnly]);
-
   useEffect(() => {
-    setPage(1);
-  }, [category, inStockOnly]);
-
-  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      if (!isValidCategory(category)) return;
+      setLoading(true);
+      setError('');
+      try {
+        const result = await listCatalogProducts(category, {
+          page,
+          limit: PAGE_SIZE,
+          inStockOnly,
+          search,
+        });
+        if (!cancelled) {
+          setProducts(result.products);
+          setTotalPages(result.totalPages);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(getApiErrorMessage(e, 'Could not load products.'));
+          setProducts([]);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+      };
     load();
-  }, [load]);
+    return () => { cancelled = true; };
+  }, [category, page, inStockOnly, search]);
 
   if (!isValidCategory(category)) {
     return <Navigate to="/collections/necklaces" replace />;
@@ -75,14 +75,14 @@ const Category = () => {
             <button
               type="button"
               className={`filter-btn ${!inStockOnly ? 'active' : ''}`}
-              onClick={() => setInStockOnly(false)}
+              onClick={() => { setPage(1); setInStockOnly(false); }}
             >
               All
             </button>
             <button
               type="button"
               className={`filter-btn ${inStockOnly ? 'active' : ''}`}
-              onClick={() => setInStockOnly(true)}
+              onClick={() => { setPage(1); setInStockOnly(true); }}
             >
               In stock
             </button>
@@ -94,6 +94,7 @@ const Category = () => {
             {error}
           </p>
         ) : null}
+        {search && <p className="search-summary">Results for “{search}” in {label.toLowerCase()}</p>}
 
         {loading ? (
           <p className="empty-state">Loading collection…</p>
@@ -139,4 +140,9 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default function Category() {
+  const { category } = useParams();
+  const [params] = useSearchParams();
+  const search = params.get('search') || '';
+  return <CategoryCollection key={`${category}-${search}`} category={category} search={search} />;
+}

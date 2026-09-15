@@ -1,15 +1,13 @@
+import { formatStorePrice as formatMoney } from '../utils/currency';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Check } from 'lucide-react';
 import { getCatalogProduct } from '../api/catalog.api';
 import { isValidCategory, getCategoryLabel } from '../constants/productCategories';
-import { AuthContext } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContextValue';
+import { useCart } from '../context/CartContextValue';
 import { getApiErrorMessage } from '../utils/adminAuth';
-import './ProductDetail.css';
 
-const formatMoney = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
 const ProductDetail = () => {
   const { category, productId } = useParams();
@@ -24,6 +22,7 @@ const ProductDetail = () => {
   const [addingToBag, setAddingToBag] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     if (!isValidCategory(category) || !productId) return;
@@ -35,8 +34,12 @@ const ProductDetail = () => {
       try {
         const p = await getCatalogProduct(category, productId);
         if (cancelled) return;
-        if (!p) setError('Product not found.');
-        else setProduct(p);
+        if (!p) {
+          setError('Product not found.');
+        } else {
+          setProduct(p);
+          setSelectedImageIndex(0);
+        }
       } catch (e) {
         if (!cancelled) {
           setError(
@@ -107,6 +110,11 @@ const ProductDetail = () => {
     setAddingToBag(false);
   };
 
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : product.imageUrl ? [product.imageUrl] : [];
+  const currentImage = images[selectedImageIndex] || product.imageUrl;
+
   return (
     <div className="product-detail">
       <div className="container product-detail__inner">
@@ -116,11 +124,30 @@ const ProductDetail = () => {
         </Link>
 
         <div className="product-detail__layout">
-          <div className="product-detail__media media-frame media-frame--product-detail">
-            {product.imageUrl ? (
-              <img src={product.imageUrl} alt={product.name} />
-            ) : (
-              <div className="media-frame__placeholder product-detail__image-placeholder">No image</div>
+          <div className="product-detail__media-col">
+            <div className="product-detail__media media-frame media-frame--product-detail">
+              {currentImage ? (
+                <img src={currentImage} alt={product.name} />
+              ) : (
+                <div className="media-frame__placeholder product-detail__image-placeholder">No image</div>
+              )}
+            </div>
+            {images.length > 1 && (
+              <div className="product-detail__gallery-thumbs">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className={`product-detail__gallery-thumb ${
+                      selectedImageIndex === idx ? 'product-detail__gallery-thumb--active' : ''
+                    }`}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    aria-label={`View photo ${idx + 1}`}
+                  >
+                    <img src={img} alt="" />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
 

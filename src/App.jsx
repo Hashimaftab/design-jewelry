@@ -1,28 +1,32 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import Category from './pages/Category';
-import ProductDetail from './pages/ProductDetail';
-import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Account from './pages/Account';
-import Payment from './pages/Payment';
-import OrderSuccess from './pages/OrderSuccess';
+
 import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import AdminPrivateRoute from './components/AdminPrivateRoute';
 import AdminPublicRoute from './components/AdminPublicRoute';
-import AdminLogin from './pages/admin/AdminLogin';
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminProductList from './pages/admin/AdminProductList';
-import AdminProductForm from './pages/admin/AdminProductForm';
-import AdminProductView from './pages/admin/AdminProductView';
-import AdminOrders from './pages/admin/AdminOrders';
+
 import CartToast from './components/CartToast';
 import './App.css';
+
+const Category = lazy(() => import('./pages/Category'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Account = lazy(() => import('./pages/Account'));
+const Payment = lazy(() => import('./pages/Payment'));
+const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminProductList = lazy(() => import('./pages/admin/AdminProductList'));
+const AdminProductForm = lazy(() => import('./pages/admin/AdminProductForm'));
+const AdminProductView = lazy(() => import('./pages/admin/AdminProductView'));
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 
 function App() {
   const location = useLocation();
@@ -32,10 +36,13 @@ function App() {
 
   return (
     <>
+      <a className="skip-link" href="#main-content">Skip to content</a>
       <CartToast />
       {!hideNavbarFooter && <Navbar />}
-      <main>
+      <main id="main-content">
+        <Suspense fallback={<p className="route-loading" role="status">Loading…</p>}>
         <Routes>
+          <Route path="*" element={<div className="not-found container"><h1>Page not found</h1><p>Let’s find something beautiful instead.</p><a className="btn btn-primary" href="/">Return to store</a></div>} />
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/collections/:category" element={<Category />} />
@@ -77,6 +84,7 @@ function App() {
             <Route path="orders" element={<AdminOrders />} />
           </Route>
         </Routes>
+        </Suspense>
       </main>
       {!hideNavbarFooter && <Footer />}
     </>

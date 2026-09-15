@@ -1,48 +1,30 @@
-import { useState, useEffect, useContext } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, User, Menu, X, Heart } from 'lucide-react';
-import { AuthContext } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContextValue';
+import { useCart } from '../context/CartContextValue';
 import BrandLogo from './BrandLogo';
 import './Navbar.css';
 
 const Navbar = () => {
   const { token } = useContext(AuthContext);
   const { cart, cartBounceKey } = useCart();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isBouncing, setIsBouncing] = useState(false);
+  const navigate = useNavigate();
   const location = useLocation();
 
   const isHome = location.pathname === '/' || location.pathname === '';
 
-  useEffect(() => {
-    if (cartBounceKey > 0) {
-      setIsBouncing(true);
-      const timer = setTimeout(() => setIsBouncing(false), 950);
-      return () => clearTimeout(timer);
-    }
-  }, [cartBounceKey]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
-
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
+  const isMenuOpen = menuPath === location.pathname;
+  const toggleMenu = () => setMenuPath(isMenuOpen ? null : location.pathname);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    if (!searchQuery.trim()) return;
+    const category = location.pathname.match(/^\/collections\/([^/]+)/)?.[1] || 'necklaces';
+    navigate('/collections/' + category + '?search=' + encodeURIComponent(searchQuery.trim()));
+    setMenuPath(null);
   };
 
   return (
@@ -55,6 +37,8 @@ const Navbar = () => {
               className="menu-toggle"
               onClick={toggleMenu}
               aria-label="Toggle Menu"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -67,11 +51,10 @@ const Navbar = () => {
             <Search size={18} className="nav-search-icon" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search jewelry" aria-label="Search jewelry"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="nav-search-input"
-              aria-label="Search"
             />
           </form>
 
@@ -93,7 +76,8 @@ const Navbar = () => {
             <Link
               to={token ? '/checkout' : '/login'}
               state={token ? undefined : { from: '/checkout' }}
-              className={`nav-action-btn cart-btn ${isBouncing ? 'cart-btn--bouncing' : ''}`}
+              key={cartBounceKey}
+              className={`nav-action-btn cart-btn ${cartBounceKey > 0 ? 'cart-btn--bouncing' : ''}`}
               aria-label="Shopping bag"
               title="Shopping Bag"
             >
@@ -101,7 +85,7 @@ const Navbar = () => {
               {token && cart.itemCount > 0 ? (
                 <span className="cart-count">
                   {cart.itemCount > 99 ? '99+' : cart.itemCount}
-                  {isBouncing && <span className="cart-count-ping" aria-hidden="true" />}
+                  {cartBounceKey > 0 && <span className="cart-count-ping" aria-hidden="true" />}
                 </span>
               ) : null}
             </Link>
@@ -119,30 +103,31 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Slide-down Menu */}
-        <div className={`nav-mobile-menu ${isMenuOpen ? 'open' : ''}`}>
+        <div id="mobile-navigation" inert={!isMenuOpen} onKeyDown={(event) => { if (event.key === 'Escape') setMenuPath(null); }} className={`nav-mobile-menu ${isMenuOpen ? 'open' : ''}`}>
           <form className="mobile-search-bar" onSubmit={handleSearchSubmit}>
             <Search size={18} className="nav-search-icon" />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search jewelry"
+              aria-label="Search jewelry"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="nav-search-input"
             />
           </form>
           <div className="mobile-nav-links">
-            <Link to="/collections/necklaces" className="mobile-nav-link" onClick={() => setIsMenuOpen(false)}>Necklaces</Link>
-            <Link to="/collections/earrings" className="mobile-nav-link" onClick={() => setIsMenuOpen(false)}>Earrings</Link>
-            <Link to="/collections/rings" className="mobile-nav-link" onClick={() => setIsMenuOpen(false)}>Rings</Link>
-            <Link to="/collections/bracelets" className="mobile-nav-link" onClick={() => setIsMenuOpen(false)}>Bracelets</Link>
+            <Link to="/collections/necklaces" className="mobile-nav-link" onClick={() => setMenuPath(null)}>Necklaces</Link>
+            <Link to="/collections/earrings" className="mobile-nav-link" onClick={() => setMenuPath(null)}>Earrings</Link>
+            <Link to="/collections/rings" className="mobile-nav-link" onClick={() => setMenuPath(null)}>Rings</Link>
+            <Link to="/collections/bracelets" className="mobile-nav-link" onClick={() => setMenuPath(null)}>Bracelets</Link>
           </div>
           <div className="mobile-user-actions">
             {token ? (
-              <Link to="/account" className="mobile-user-link" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/account" className="mobile-user-link" onClick={() => setMenuPath(null)}>
                 <User size={18} /> My Account
               </Link>
             ) : (
-              <Link to="/login" className="mobile-user-link" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/login" className="mobile-user-link" onClick={() => setMenuPath(null)}>
                 <User size={18} /> Sign In
               </Link>
             )}

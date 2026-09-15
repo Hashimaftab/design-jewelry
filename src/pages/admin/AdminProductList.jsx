@@ -1,14 +1,12 @@
+import { formatStorePrice as formatMoney } from '../../utils/currency';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { Pencil, Trash2, Plus, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Pencil, Trash2, Plus, Eye, ChevronLeft, ChevronRight, Sparkles, RefreshCw } from 'lucide-react';
 import { listProducts, deleteProduct } from '../../api/products.api';
 import { parseListResponse } from '../../utils/productHelpers';
 import { isValidCategory, getCategoryLabel } from '../../constants/productCategories';
 import { getApiErrorMessage } from '../../utils/adminAuth';
-import './AdminProductList.css';
 
-const formatMoney = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
 const LIMIT = 10;
 
@@ -81,15 +79,21 @@ const AdminProductList = () => {
     <div className="admin-product-list">
       <header className="admin-product-list__head">
         <div>
+          <div className="admin-eyebrow"><Sparkles size={14} />Collection Management</div>
           <h2>{label}</h2>
           <p>
             Manage {label.toLowerCase()} inventory. {total > 0 ? `${total} total.` : ''}
           </p>
         </div>
+        <div className="admin-header-actions">
+        <button type="button" className="admin-orders__refresh-btn" disabled={loading} onClick={load}>
+          <RefreshCw size={15} /> Refresh
+        </button>
         <Link to={`/admin/products/${category}/new`} className="admin-product-list__add">
           <Plus size={18} strokeWidth={2} />
           Add product
         </Link>
+        </div>
       </header>
 
       <form className="admin-product-search" onSubmit={handleSearchSubmit}>

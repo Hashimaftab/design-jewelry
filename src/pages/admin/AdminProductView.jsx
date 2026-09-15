@@ -1,14 +1,12 @@
+import { formatStorePrice as formatMoney } from '../../utils/currency';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link, Navigate } from 'react-router-dom';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil, Sparkles } from 'lucide-react';
 import { getProduct } from '../../api/products.api';
 import { parseProductResponse } from '../../utils/productHelpers';
 import { isValidCategory, getCategoryLabel } from '../../constants/productCategories';
 import { getApiErrorMessage } from '../../utils/adminAuth';
-import './AdminProductForm.css';
 
-const formatMoney = (n) =>
-  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
 
 const AdminProductView = () => {
   const { id, category } = useParams();
@@ -83,7 +81,10 @@ const AdminProductView = () => {
       </button>
 
       <div className="admin-product-view__head">
+        <div>
+        <div className="admin-eyebrow"><Sparkles size={14} />Product Details</div>
         <h2 className="admin-product-form__title">{product.name}</h2>
+        </div>
         <Link
           to={`/admin/products/${category}/${product.id}/edit`}
           className="admin-product-view__edit"
@@ -116,7 +117,25 @@ const AdminProductView = () => {
         ) : null}
       </dl>
 
-      {product.imageUrl ? (
+      {product.images && product.images.length > 1 ? (
+        <div>
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-charcoal, #36454f)', margin: '1.5rem 0 0.75rem' }}>
+            Product Images ({product.images.length})
+          </h3>
+          <div className="admin-product-view__gallery">
+            {product.images.map((img, idx) => (
+              <div key={idx} className="admin-product-view__gallery-item">
+                <span className="admin-product-view__gallery-role">
+                  {idx === 0 ? '1 • Primary' : idx === 1 ? '2 • Hover' : `${idx + 1} • Gallery`}
+                </span>
+                <div className="media-frame media-frame--preview">
+                  <img src={img} alt={`${product.name} view ${idx + 1}`} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : product.imageUrl ? (
         <div className="admin-product-view__hero media-frame media-frame--preview-lg">
           <img src={product.imageUrl} alt={product.name} />
         </div>

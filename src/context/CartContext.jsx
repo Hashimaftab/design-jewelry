@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import {
   getCart,
   addToCart as addToCartApi,
@@ -7,10 +7,10 @@ import {
   clearCart as clearCartApi,
   checkoutCart,
 } from '../api/cart.api';
-import { AuthContext } from './AuthContext';
+import { AuthContext } from './AuthContextValue';
 import { getApiErrorMessage } from '../utils/adminAuth';
 
-export const CartContext = createContext(null);
+import { CartContext } from './CartContextValue';
 
 const emptyCart = { items: [], itemCount: 0, subtotal: 0 };
 
@@ -152,11 +152,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-
-export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) {
-    throw new Error('useCart must be used within CartProvider');
-  }
-  return ctx;
-}

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContextValue';
 import {
   ApiRequestError,
   formatStorePrice,
@@ -12,7 +12,6 @@ import {
   createStripePaymentIntent,
 } from '../api/payments.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
-import './Checkout.css';
 
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = publishableKey ? loadStripe(publishableKey, { locale: 'nl' }) : null;
@@ -40,8 +39,6 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
 
     try {
       // Log for debugging
-      console.log('Starting payment confirmation for order:', orderId);
-      console.log('Return URL:', returnUrl);
 
       const result = await stripe.confirmPayment({
         elements,
@@ -58,10 +55,8 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
         redirect: 'if_required',
       });
 
-      console.log('Payment result:', result);
 
       if (result?.error) {
-        console.error('Stripe payment error:', result.error);
         const errorMessage = result.error.message || result.error.code || 'Payment failed';
         onError(`Payment Error: ${errorMessage}`);
         return;
@@ -74,16 +69,13 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
         return;
       }
 
-      console.log('Payment intent status:', paymentIntent.status);
 
       if (paymentIntent.status === 'succeeded') {
-        console.log('Payment succeeded, redirecting to success page');
         navigate(`/order-success/${orderId}`, { replace: true });
         return;
       }
 
       if (paymentIntent.status === 'processing') {
-        console.log('Payment is processing');
         onError('Payment is processing. Please wait...');
         // Optionally redirect after a delay
         setTimeout(() => {
@@ -104,7 +96,6 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
 
       onError(`Payment status: ${paymentIntent.status}. Please contact support if this persists.`);
     } catch (err) {
-      console.error('Payment exception:', err);
       onError(err?.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setBusy(false);
@@ -179,12 +170,15 @@ const Payment = () => {
       try {
         if (!publishableKey) {
           throw new Error(
-            'Stripe is not configured. Set VITE_STRIPE_PUBLISHABLE_KEY in your environment.',
+            'Online payment is temporarily unavailable. Please try again later.',
           );
         }
 
         const configRes = await getStoreConfig();
         const config = configRes?.store ?? configRes;
+        if (config?.currencyCode && config.currencyCode.toUpperCase() !== 'EUR') {
+          throw new Error('Euro payments are temporarily unavailable. Please contact support.');
+        }
         const diagnostics = configRes?.payments ?? null;
         const orderSummary = await getOrderPaymentSummary(orderId, token);
         if (cancelled) return;
@@ -197,7 +191,7 @@ const Payment = () => {
         const intent = await createStripePaymentIntent(orderId, token);
         if (!intent?.clientSecret) {
           throw new Error(
-            `Could not start payment session. Backend response: ${JSON.stringify(intent)}`,
+            'Could not start your payment session. Please try again.',
           );
         }
 
@@ -207,10 +201,9 @@ const Payment = () => {
         setClientSecret(intent.clientSecret);
       } catch (err) {
         if (cancelled) return;
-        console.error('Payment setup error:', err);
         const message =
           err instanceof ApiRequestError
-            ? `API Error (${err.status}): ${err.message}`
+            ? err.message
             : getApiErrorMessage(err, 'Could not load payment details.');
         setError(message);
       } finally {
@@ -273,14 +266,7 @@ const Payment = () => {
 
             {paymentDiagnostics && !paymentDiagnostics.idealTestIntentOk ? (
               <p className="checkout-alert checkout-alert--error">
-                iDEAL is not available for this Stripe account
-                {paymentDiagnostics.stripeAccountCountry
-                  ? ` (country: ${paymentDiagnostics.stripeAccountCountry})`
-                  : ''}
-                . Use a Netherlands/EU Stripe business profile, or pay by card.
-                {paymentDiagnostics.idealTestError
-                  ? ` Stripe: ${paymentDiagnostics.idealTestError}`
-                  : ''}
+                iDEAL is temporarily unavailable. Please choose card payment.
               </p>
             ) : null}
 
@@ -293,19 +279,23 @@ const Payment = () => {
                   <strong>#{orderId?.slice(0, 8)}</strong>
                 </div>
                 <div className="summary-item">
-                  <span>Subtotaal</span>
+                  <span>Subtotal</span>
                   <strong>{formatStorePrice(summary.subtotalAmount)}</strong>
                 </div>
-                <div className="summary-item">
-                  <span>
-                    {summary.vatLabel} ({summary.vatRatePercent}%)
-                  </span>
-                  <strong>{formatStorePrice(summary.vatAmount)}</strong>
-                </div>
-                <div className="summary-item">
-                  <span>Verzending</span>
-                  <strong>{formatStorePrice(summary.shippingAmount)}</strong>
-                </div>
+                {summary.vatAmount > 0 ? (
+                  <div className="summary-item">
+                    <span>
+                      {summary.vatLabel} ({summary.vatRatePercent}%)
+                    </span>
+                    <strong>{formatStorePrice(summary.vatAmount)}</strong>
+                  </div>
+                ) : null}
+                {summary.shippingAmount > 0 ? (
+                  <div className="summary-item">
+                    <span>Shipping</span>
+                    <strong>{formatStorePrice(summary.shippingAmount)}</strong>
+                  </div>
+                ) : null}
                 <div className="summary-item grand-total">
                   <span>Total</span>
                   <strong>{formatStorePrice(summary.grandTotalAmount)}</strong>
@@ -347,12 +337,14 @@ const Payment = () => {
               <span>Currency</span>
               <strong>{storeConfig?.currencyCode?.toUpperCase() ?? 'EUR'}</strong>
             </div>
-            <div className="summary-item">
-              <span>VAT</span>
-              <strong>
-                {storeConfig?.vatRatePercent}% {storeConfig?.vatLabel}
-              </strong>
-            </div>
+            {storeConfig?.vatRatePercent > 0 ? (
+              <div className="summary-item">
+                <span>VAT</span>
+                <strong>
+                  {storeConfig.vatRatePercent}% {storeConfig.vatLabel}
+                </strong>
+              </div>
+            ) : null}
           </div>
         </aside>
       </div>

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { loginUser } from '../api/user/login';
 import { registerUser } from '../api/user/register';
 import { logoutUser } from '../api/user/logout';
@@ -12,7 +12,7 @@ import {
 } from '../constants/userAuth';
 import { getApiErrorMessage } from '../utils/adminAuth';
 
-export const AuthContext = createContext();
+import { AuthContext } from './AuthContextValue';
 
 function persistSession({ user, accessToken, refreshToken }) {
   if (accessToken) localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
@@ -31,8 +31,10 @@ export const AuthProvider = ({ children }) => {
     }
   });
   const [loading, setLoading] = useState(true);
+  const [sessionError, setSessionError] = useState('');
 
   const clearSession = useCallback(() => {
+    setSessionError('');
     setToken(null);
     setUser(null);
     localStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }) => {
           const response = await getMeUser();
           const me = parseMeUser(response);
           if (response.success && me) {
+            setSessionError('');
             setUser(me);
             localStorage.setItem(USER_KEY, JSON.stringify(me));
           }
@@ -60,7 +63,7 @@ export const AuthProvider = ({ children }) => {
           if (error.response?.status === 401) {
             clearSession();
           } else {
-            console.warn('Could not verify session with server, keeping local state.');
+            setSessionError('We could not refresh your profile. Please try again.');
           }
         }
       }
@@ -68,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     verifySession();
-  }, []);
+  }, [token, clearSession]);
 
   const applySession = useCallback((session) => {
     setToken(session.accessToken);
@@ -117,13 +120,14 @@ export const AuthProvider = ({ children }) => {
         await logoutUser(refreshToken);
       }
     } catch {
-      console.error('Logout API failed, cleaning up locally.');
+      // Always complete local sign-out when the server is unavailable.
     } finally {
       clearSession();
     }
   };
 
   const refreshUser = async () => {
+    setSessionError('');
     try {
       const response = await getMeUser();
       const me = parseMeUser(response);
@@ -132,12 +136,12 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem(USER_KEY, JSON.stringify(me));
       }
     } catch {
-      console.error('Refresh failed.');
+      setSessionError('We could not refresh your profile. Please try again.');
     }
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, register, logout, refreshUser, loading }}>
+    <AuthContext.Provider value={{ token, user, login, register, logout, refreshUser, loading, sessionError }}>
       {!loading && children}
     </AuthContext.Provider>
   );

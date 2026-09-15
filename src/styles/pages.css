@@ -1,0 +1,11 @@
+/* Load route styles before the shared refinements, independent of navigation order. */
+@import '../pages/Auth.css';
+@import '../pages/Category.css';
+@import '../pages/ProductDetail.css';
+@import '../pages/Checkout.css';
+@import '../pages/admin/AdminDashboard.css';
+@import '../pages/admin/AdminLayout.css';
+@import '../pages/admin/AdminLogin.css';
+@import '../pages/admin/AdminOrders.css';
+@import '../pages/admin/AdminProductForm.css';
+@import '../pages/admin/AdminProductList.css';

@@ -22,12 +22,14 @@ export function productsBasePath(categorySlug) {
  *   quantity?: number,
  *   isAvailable?: boolean,
  *   image?: File,
+ *   images?: File[],
+ *   existingImages?: string[],
  * }} fields
  * @returns {FormData}
  */
 export function buildProductFormData(fields) {
   const form = new FormData();
-  const { name, description, price, quantity, isAvailable, image } = fields;
+  const { name, description, price, quantity, isAvailable, image, images, existingImages } = fields;
 
   if (name !== undefined) form.append('name', name);
   if (description !== undefined) form.append('description', description);
@@ -37,6 +39,16 @@ export function buildProductFormData(fields) {
     form.append('isAvailable', isAvailable ? 'true' : 'false');
   }
   if (image instanceof File) form.append('image', image);
+  if (Array.isArray(images)) {
+    images.forEach((file) => {
+      if (file instanceof File) {
+        form.append('images', file);
+      }
+    });
+  }
+  if (Array.isArray(existingImages)) {
+    form.append('existingImages', JSON.stringify(existingImages));
+  }
 
   return form;
 }

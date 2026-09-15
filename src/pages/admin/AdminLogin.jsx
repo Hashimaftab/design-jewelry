@@ -1,8 +1,7 @@
 import { ArrowLeft, Lock } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useContext } from 'react';
-import { AdminAuthContext } from '../../context/AdminAuthContext';
-import './AdminLogin.css';
+import { AdminAuthContext } from '../../context/AdminAuthContextValue';
 
 const AdminLogin = () => {
   const { login } = useContext(AdminAuthContext);

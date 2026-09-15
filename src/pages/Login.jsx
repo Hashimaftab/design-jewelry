@@ -1,13 +1,16 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContextValue';
 import BrandLogo from '../components/BrandLogo';
-import './Auth.css';
 
 const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
+  const destination = typeof from === 'string' ? from : from?.pathname;
+  const redirectTo = destination?.startsWith('/') && !destination.startsWith('//') ? destination : '/account';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

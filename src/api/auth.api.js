@@ -5,8 +5,7 @@
  */
 
 import axiosInstance from './axiosInstance';
-import { API_BASE_URL, USER_ROUTES } from './config';
-import { refreshUserToken } from './tokenRefresh';
+import { USER_ROUTES } from './config';
 
 export {
   getUserDisplayName,
@@ -18,7 +17,7 @@ export { API_BASE_URL, USER_ROUTES, ADMIN_ROUTES } from './config';
 export { refreshUserToken, refreshAdminToken } from './tokenRefresh';
 
 // Re-export admin auth for convenience (canonical: admin/* modules or adminAuth.api.js)
-export { loginAdmin, logoutAdmin, getMeAdmin, ADMIN_ROUTES } from './adminAuth.api';
+export { loginAdmin, logoutAdmin, getMeAdmin } from './adminAuth.api';
 
 /**
  * @typedef {'customer' | 'admin'} UserRole

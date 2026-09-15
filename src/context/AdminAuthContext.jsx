@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { loginAdmin } from '../api/admin/login';
 import { logoutAdmin } from '../api/admin/logout';
 import { getMeAdmin } from '../api/admin/me';
@@ -11,7 +11,7 @@ import {
 } from '../constants/adminAuth';
 import { isAdminRole, getApiErrorMessage } from '../utils/adminAuth';
 
-export const AdminAuthContext = createContext();
+import { AdminAuthContext } from './AdminAuthContextValue';
 
 export const AdminAuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem(ADMIN_TOKEN_KEY));
@@ -70,7 +70,7 @@ export const AdminAuthProvider = ({ children }) => {
     };
 
     verifySession();
-  }, []);
+  }, [token, clearAdminSession]);
 
   const applySession = useCallback((session) => {
     setToken(session.accessToken);

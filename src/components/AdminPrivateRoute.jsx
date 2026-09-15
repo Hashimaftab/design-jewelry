@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { AdminAuthContext } from '../context/AdminAuthContext';
+import { AdminAuthContext } from '../context/AdminAuthContextValue';
 
 const AdminPrivateRoute = ({ children }) => {
   const { token, loading, isAdmin } = useContext(AdminAuthContext);
