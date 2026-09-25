@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContextValue';
 import BrandLogo from '../components/BrandLogo';
+import { useLanguage } from '../context/LanguageContextValue';
 
 const Signup = () => {
+  const { t } = useLanguage();
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -21,12 +23,12 @@ const Signup = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError(t('auth.passwordMismatch'));
       return;
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters and include a letter and a number.');
+      setError(t('auth.passwordWeak'));
       return;
     }
 
@@ -52,7 +54,7 @@ const Signup = () => {
       <div className="auth-container">
         <Link to="/" className="back-link">
           <ArrowLeft size={16} />
-          <span>Return to Store</span>
+          <span>{t('common.backToStore')}</span>
         </Link>
         <div className="auth-header">
           <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -61,8 +63,8 @@ const Signup = () => {
               className="auth-logo-img"
             />
           </Link>
-          <h2>Create Account</h2>
-          <p>Join us to experience exclusive early access to new collections.</p>
+          <h2>{t('auth.createAccount')}</h2>
+          <p>{t('auth.createIntro')}</p>
         </div>
 
         {error && (
@@ -77,24 +79,24 @@ const Signup = () => {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="input-row">
             <div className="input-group">
-              <label htmlFor="firstName">First name</label>
+              <label htmlFor="firstName">{t('auth.firstName')}</label>
               <input
                 type="text"
                 id="firstName"
                 className="form-input"
-                placeholder="First name"
+                placeholder={t('auth.firstName')}
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
               />
             </div>
             <div className="input-group">
-              <label htmlFor="lastName">Last name</label>
+              <label htmlFor="lastName">{t('auth.lastName')}</label>
               <input
                 type="text"
                 id="lastName"
                 className="form-input"
-                placeholder="Last name"
+                placeholder={t('auth.lastName')}
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
@@ -102,24 +104,24 @@ const Signup = () => {
             </div>
           </div>
           <div className="input-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">{t('auth.email')}</label>
             <input
               type="email"
               id="email"
               className="form-input"
-              placeholder="Enter your email"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           <div className="input-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('auth.password')}</label>
             <input
               type="password"
               id="password"
               className="form-input"
-              placeholder="Min. 8 characters, letter + number"
+              placeholder={t('auth.passwordRule')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={8}
@@ -127,26 +129,26 @@ const Signup = () => {
             />
           </div>
           <div className="input-group">
-            <label htmlFor="confirmPassword">Confirm password</label>
+            <label htmlFor="confirmPassword">{t('auth.confirmPassword')}</label>
             <input
               type="password"
               id="confirmPassword"
               className="form-input"
-              placeholder="Confirm your password"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
           <button type="submit" className="auth-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Creating...' : 'Create Account'}
+            {isSubmitting ? t('auth.creating') : t('auth.createAccount')}
           </button>
         </form>
 
         <p className="auth-footer">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <Link to="/login" className="auth-link">
-            Sign In
+            {t('auth.signIn')}
           </Link>
         </p>
       </div>

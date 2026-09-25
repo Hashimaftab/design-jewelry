@@ -1,5 +1,6 @@
 import axiosInstance from './axiosInstance';
 import { PAYMENT_ROUTES } from './config';
+import { orderHeaders } from './orderAccess';
 
 export class ApiRequestError extends Error {
   constructor(error) {
@@ -9,10 +10,6 @@ export class ApiRequestError extends Error {
     this.errors = error?.response?.data?.errors ?? [];
     this.response = error?.response ?? null;
   }
-}
-
-function buildAuthHeaders(token) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 function extractResponseData(res) {
@@ -32,7 +29,7 @@ export { formatStorePrice } from '../utils/currency';
 
 export const getStoreConfig = async () => {
   try {
-    const res = await axiosInstance.get(PAYMENT_ROUTES.storeConfig);
+    const res = await axiosInstance.get(PAYMENT_ROUTES.storeConfig, { skipCustomerAuth: true });
     const data = extractResponseData(res);
     if (data?.store) {
       return data;
@@ -46,7 +43,7 @@ export const getStoreConfig = async () => {
 export const getOrderPaymentSummary = async (orderId, token) => {
   try {
     const res = await axiosInstance.get(PAYMENT_ROUTES.orderSummary(orderId), {
-      headers: buildAuthHeaders(token),
+      headers: orderHeaders(orderId, token),
     });
     const data = extractResponseData(res);
     return data?.summary ?? data;
@@ -61,7 +58,7 @@ export const createStripePaymentIntent = async (orderId, token) => {
       PAYMENT_ROUTES.createIntent(orderId),
       {},
       {
-        headers: buildAuthHeaders(token),
+        headers: orderHeaders(orderId, token),
       },
     );
     const data = extractResponseData(res);
@@ -87,7 +84,7 @@ export const confirmCardPayment = async (orderId, card, token) => {
       PAYMENT_ROUTES.confirmPayment(orderId),
       payload,
       {
-        headers: buildAuthHeaders(token),
+        headers: orderHeaders(orderId, token),
       },
     );
     const data = extractResponseData(res);

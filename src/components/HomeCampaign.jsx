@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion as Motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Pause, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContextValue';
 
 export default function HomeCampaign({ image, imagePosition = 'center', eyebrow, title, href, cta, hero = false }) {
   const sectionRef = useRef(null);
@@ -11,6 +12,7 @@ export default function HomeCampaign({ image, imagePosition = 'center', eyebrow,
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['-5%', '5%']);
   const Heading = hero ? 'h1' : 'h2';
+  const { t } = useLanguage();
 
   return (
     <section ref={sectionRef} className={`home-campaign${hero ? ' home-campaign--hero' : ''}`}>
@@ -40,7 +42,7 @@ export default function HomeCampaign({ image, imagePosition = 'center', eyebrow,
           type="button"
           className="home-campaign__motion-toggle"
           onClick={() => setPaused(!paused)}
-          aria-label={`${paused ? 'Play' : 'Pause'} image animation: ${title}`}
+          aria-label={`${t(paused ? 'campaign.play' : 'campaign.pause')} ${t('campaign.animation', { title })}`}
           aria-pressed={paused}
         >
           {paused ? <Play size={21} strokeWidth={1.3} /> : <Pause size={21} strokeWidth={1.3} />}

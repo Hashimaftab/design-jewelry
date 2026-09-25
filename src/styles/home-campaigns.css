@@ -13,7 +13,7 @@
   background: #332b26;
 }
 .home-page.home-campaigns > .home-campaign--hero {
-  height: calc(100svh - var(--home-header-height, 92px));
+  height: 100svh;
   min-height: 520px;
 }
 .home-campaign__media { position: absolute; inset: -6% 0; will-change: transform; }
@@ -115,8 +115,17 @@
 .home-campaigns .newsletter-title { font-family: var(--font-sans); text-transform: uppercase; font-weight: 600; font-size: clamp(1.7rem, 3vw, 2.5rem); }
 .home-campaigns .newsletter-form, .home-campaigns .newsletter-badge { border-radius: 0; box-shadow: none; }
 @media (max-width: 700px) {
-  .home-page.home-campaigns > .home-campaign { height: 85svh; min-height: 540px; max-height: 850px; }
-  .home-page.home-campaigns > .home-campaign--hero { height: calc(100svh - var(--home-header-height, 92px)); min-height: 520px; }
+  .home-page.home-campaigns > .home-campaign {
+    height: 100vh;
+    height: 100svh;
+    min-height: max(520px, 100svh);
+    max-height: none;
+  }
+  .home-page.home-campaigns > .home-campaign--hero {
+    height: 100vh;
+    height: 100svh;
+    min-height: max(520px, 100svh);
+  }
   .home-campaign__copy { bottom: 32px; padding-right: 56px; }
   .home-campaign__copy :is(h1,h2) { font-size: clamp(1.8rem, 7vw, 2.6rem); margin-bottom: 2rem; }
   .home-campaign__copy > p { margin-bottom: 1rem; font-size: .85rem; }

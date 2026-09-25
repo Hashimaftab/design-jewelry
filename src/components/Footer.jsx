@@ -1,44 +1,57 @@
 import BrandLogo from './BrandLogo';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContextValue';
 import './Footer.css';
 
 const Footer = () => {
+  const { t } = useLanguage();
   return (
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer-brand">
           <BrandLogo variant="dark" className="footer-logo-img" />
-          <p>Elegance in every detail. Fine luxury jewelry crafted for the modern aesthetic.</p>
+          <p>{t('footer.tagline')}</p>
         </div>
         <div className="footer-links-group">
           <div className="footer-col">
-            <h3>Shop</h3>
+            <h3>{t('footer.shop')}</h3>
             <ul>
-              <li><a href="/collections/necklaces">Necklaces</a></li>
-              <li><a href="/collections/earrings">Earrings</a></li>
-              <li><a href="/collections/bracelets">Bracelets</a></li>
-              <li><a href="/collections/rings">Rings</a></li>
+              <li><a href="/collections/necklaces">{t('category.necklaces')}</a></li>
+              <li><a href="/collections/earrings">{t('category.earrings')}</a></li>
+              <li><a href="/collections/bracelets">{t('category.bracelets')}</a></li>
+              <li><a href="/collections/rings">{t('category.rings')}</a></li>
+              <li><a href="/collections/gifts">{t('category.gifts')}</a></li>
             </ul>
           </div>
           <div className="footer-col">
-            <h3>About</h3>
+            <h3>{t('footer.about')}</h3>
             <ul>
-              <li><a href="#">Our Story</a></li>
-              <li><a href="#">Sustainability</a></li>
-              <li><a href="#">Journal</a></li>
+              <li><a href="#">{t('footer.story')}</a></li>
+              <li><a href="#">{t('footer.sustainability')}</a></li>
+              <li><a href="#">{t('footer.journal')}</a></li>
             </ul>
           </div>
           <div className="footer-col">
-            <h3>Support</h3>
+            <h3>{t('footer.support')}</h3>
             <ul>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Shipping & Returns</a></li>
-              <li><a href="#">Care Guide</a></li>
+              <li><a href="#">{t('footer.contact')}</a></li>
+              <li><a href="#">{t('footer.shippingReturns')}</a></li>
+              <li><a href="#">{t('footer.careGuide')}</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h3>{t('footer.legal')}</h3>
+            <ul>
+              <li><Link to="/privacy-policy">{t('footer.privacyPolicy')}</Link></li>
+              <li><Link to="/shipping-policy">{t('footer.shippingPolicy')}</Link></li>
+              <li><Link to="/return-policy">{t('footer.returnPolicy')}</Link></li>
+              <li><Link to="/terms-of-service">{t('footer.termsOfService')}</Link></li>
             </ul>
           </div>
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} HUSAN Jewelry. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} HUSAN Jewelry. {t('footer.rights')}</p>
       </div>
     </footer>
   );

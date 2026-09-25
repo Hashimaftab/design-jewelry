@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams, Navigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { listCatalogProducts } from '../api/catalog.api';
-import { isValidCategory } from '../constants/productCategories';
+import { listAllCatalogProducts } from '../api/catalog.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
 import { useLanguage } from '../context/LanguageContextValue';
 
 const PAGE_SIZE = 12;
 
-const CATEGORY_META = {
-  necklaces: { titleKey: 'category.necklacesTitle', bg: '/hero_bg.png' },
-  earrings: { titleKey: 'category.earringsTitle', bg: '/cat_earrings.png' },
-  rings: { titleKey: 'category.ringsTitle', bg: '/gift_love.png' },
-  bracelets: { titleKey: 'category.braceletsTitle', bg: '/cat_bracelets.png' },
-  gifts: { titleKey: 'category.giftsTitle', bg: '/cat_gifts.png' },
+const VARIANT_META = {
+  all: {
+    titleKey: 'catalog.allPieces',
+    bg: '/hero_bg.png',
+    descKey: 'catalog.allPiecesDescription',
+  },
+  new: {
+    titleKey: 'catalog.newArrivals',
+    bg: '/cat_newin.png',
+    descKey: 'catalog.newArrivalsDescription',
+  },
 };
 
-const CategoryCollection = ({ category, search }) => {
+const AllProducts = ({ variant = 'all' }) => {
   const { t } = useLanguage();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,16 +31,10 @@ const CategoryCollection = ({ category, search }) => {
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      if (!isValidCategory(category)) return;
       setLoading(true);
       setError('');
       try {
-        const result = await listCatalogProducts(category, {
-          page,
-          limit: PAGE_SIZE,
-          inStockOnly,
-          search,
-        });
+        const result = await listAllCatalogProducts({ page, limit: PAGE_SIZE, inStockOnly });
         if (!cancelled) {
           setProducts(result.products);
           setTotalPages(result.totalPages);
@@ -50,23 +47,18 @@ const CategoryCollection = ({ category, search }) => {
       } finally {
         if (!cancelled) setLoading(false);
       }
-      };
+    };
     load();
     return () => { cancelled = true; };
-  }, [category, page, inStockOnly, search, t]);
+  }, [page, inStockOnly, t]);
 
-  if (!isValidCategory(category)) {
-    return <Navigate to="/collections/necklaces" replace />;
-  }
-
-  const meta = CATEGORY_META[category] ?? { titleKey: 'category.ourCollection', bg: '/necklace.png' };
-  const label = t(`category.${category}`);
+  const meta = VARIANT_META[variant] ?? VARIANT_META.all;
 
   return (
     <div className="category-page">
       <div className="category-header" style={{ backgroundImage: `url(${meta.bg})` }}>
         <h1 className="category-title">{t(meta.titleKey)}</h1>
-        <p className="category-desc">{t('category.description', { category: label.toLowerCase() })}</p>
+        <p className="category-desc">{t(meta.descKey)}</p>
       </div>
 
       <div className="container">
@@ -94,7 +86,6 @@ const CategoryCollection = ({ category, search }) => {
             {error}
           </p>
         ) : null}
-        {search && <p className="search-summary">{t('category.results', { search, category: label.toLowerCase() })}</p>}
 
         {loading ? (
           <p className="empty-state">{t('category.loading')}</p>
@@ -102,13 +93,13 @@ const CategoryCollection = ({ category, search }) => {
           <>
             <div className="products-grid">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} categorySlug={category} />
+                <ProductCard key={`${product.category}-${product.id}`} product={product} categorySlug={product.categorySlug} />
               ))}
             </div>
 
             {products.length === 0 && !error ? (
               <div className="empty-state">
-                <p>{t('category.empty')}</p>
+                <p>{t('catalog.empty')}</p>
               </div>
             ) : null}
 
@@ -140,9 +131,4 @@ const CategoryCollection = ({ category, search }) => {
   );
 };
 
-export default function Category() {
-  const { category } = useParams();
-  const [params] = useSearchParams();
-  const search = params.get('search') || '';
-  return <CategoryCollection key={`${category}-${search}`} category={category} search={search} />;
-}
+export default AllProducts;

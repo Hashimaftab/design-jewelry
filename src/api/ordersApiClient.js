@@ -7,12 +7,11 @@
 import adminAxiosInstance from './adminAxiosInstance';
 import axiosInstance from './axiosInstance';
 import { API_BASE_URL } from './config';
+import { checkoutCart } from './cart.api';
+import { orderHeaders } from './orderAccess';
 import { getAdminOrdersPage } from '../utils/adminOrderHelpers';
 
-const ORDERS_API_BASE_URL =
-  import.meta.env.VITE_ORDERS_API_URL ||
-  import.meta.env.VITE_API_URL ||
-  API_BASE_URL;
+const ORDERS_API_BASE_URL = API_BASE_URL;
 
 /**
  * Helper to make HTTP requests
@@ -38,31 +37,9 @@ async function request(endpoint, options = {}) {
 }
 
 export const ordersApi = {
-  /**
-   * 1. Place a new order (Customer Checkout)
-   * Automatically sends email notification to admin (hassanaftab912@gmail.com).
-   *
-   * @param {Object} orderData
-   * @param {Array<{product_id: number, quantity: number, ring_size?: number|string}>} orderData.items
-   * @param {Object} orderData.shipping_address
-   * @param {string} orderData.shipping_address.full_name
-   * @param {string} orderData.shipping_address.email
-   * @param {string} orderData.shipping_address.phone
-   * @param {string} orderData.shipping_address.address_line1
-   * @param {string} [orderData.shipping_address.address_line2]
-   * @param {string} orderData.shipping_address.city
-   * @param {string} [orderData.shipping_address.state]
-   * @param {string} orderData.shipping_address.postal_code
-   * @param {string} [orderData.shipping_address.country]
-   * @param {string} [orderData.payment_method] - e.g. 'credit_card', 'cash_on_delivery'
-   * @param {string} [orderData.notes]
-   * @returns {Promise<{status: string, message: string, data: Object}>}
-   */
+  // Shared checkout saves guest access before the caller navigates to payment.
   async placeOrder(orderData) {
-    return request('/orders', {
-      method: 'POST',
-      body: orderData,
-    });
+    return { success: true, data: { order: await checkoutCart(orderData) } };
   },
 
   /**
@@ -78,7 +55,8 @@ export const ordersApi = {
    */
   async getAdminOrders(params = {}) {
     const response = await request('/admin/orders', { method: 'GET' });
-    return { ...response, data: getAdminOrdersPage(response?.data?.orders || [], params) };
+    if (!Array.isArray(response?.data?.orders)) throw new Error('Invalid orders response. Please retry.');
+    return { ...response, data: getAdminOrdersPage(response.data.orders, params) };
   },
 
   /**
@@ -132,7 +110,7 @@ export const ordersApi = {
    * @returns {Promise<{status: string, data: {orders: Array, total_items: number}}>}
    */
   async getMyOrders(page = 1, limit = 15) {
-    return request(`/orders?page=${page}&limit=${limit}`, {
+    return request(`/cart/orders?page=${page}&limit=${limit}`, {
       method: 'GET',
     });
   },
@@ -146,6 +124,7 @@ export const ordersApi = {
   async getMyOrder(orderId) {
     return request(`/orders/${orderId}`, {
       method: 'GET',
+      headers: orderHeaders(orderId),
     });
   },
 };

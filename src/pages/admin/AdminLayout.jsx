@@ -11,6 +11,7 @@ import {
   Sparkles,
   Circle,
   Link2,
+  Gift,
 } from 'lucide-react';
 import { AdminAuthContext } from '../../context/AdminAuthContextValue';
 import { getUserDisplayName } from '../../api/authHelpers';
@@ -21,6 +22,7 @@ const categoryIcon = {
   earrings: Sparkles,
   rings: Circle,
   bracelets: Link2,
+  gifts: Gift,
 };
 
 const AdminLayout = () => {

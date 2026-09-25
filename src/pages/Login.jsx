@@ -3,8 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContextValue';
 import BrandLogo from '../components/BrandLogo';
+import { useLanguage } from '../context/LanguageContextValue';
 
 const Login = () => {
+  const { t } = useLanguage();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,7 +39,7 @@ const Login = () => {
       <div className="auth-container">
         <Link to="/" className="back-link">
           <ArrowLeft size={16} />
-          <span>Return to Store</span>
+          <span>{t('common.backToStore')}</span>
         </Link>
         <div className="auth-header">
           <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -46,20 +48,20 @@ const Login = () => {
               className="auth-logo-img"
             />
           </Link>
-          <h2>Welcome Back</h2>
-          <p>Sign in to access your curated collections and orders.</p>
+          <h2>{t('auth.welcomeBack')}</h2>
+          <p>{t('auth.loginIntro')}</p>
         </div>
         
         {error && <div className="auth-error" style={{ color: 'red', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</div>}
         
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="email">{t('auth.email')}</label>
             <input 
               type="email" 
               id="email" 
               className="form-input" 
-              placeholder="Enter your email" 
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
@@ -67,26 +69,26 @@ const Login = () => {
           </div>
           <div className="input-group">
             <div className="label-row">
-              <label htmlFor="password">Password</label>
-              <a href="#" className="forgot-password">Forgot password?</a>
+              <label htmlFor="password">{t('auth.password')}</label>
+              <a href="#" className="forgot-password">{t('auth.forgotPassword')}</a>
             </div>
             <input 
               type="password" 
               id="password" 
               className="form-input" 
-              placeholder="Enter your password" 
+              placeholder={t('auth.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
             />
           </div>
           <button type="submit" className="auth-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
           </button>
         </form>
         
         <p className="auth-footer">
-          Don't have an account? <Link to="/signup" className="auth-link">Create Account</Link>
+          {t('auth.noAccount')} <Link to="/signup" className="auth-link">{t('auth.createAccount')}</Link>
         </p>
       </div>
       <div className="auth-image" style={{ backgroundImage: `url('/shop_look.png')` }}></div>

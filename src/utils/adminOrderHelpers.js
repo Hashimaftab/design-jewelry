@@ -3,7 +3,7 @@ export function getOrderLabel(order) {
 }
 
 export function getOrderCustomerName(order) {
-  return [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ').trim()
+  return order.contact?.fullName || [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ').trim()
     || order.customer?.name || 'Guest Customer';
 }
 
@@ -39,7 +39,7 @@ export function getAdminOrdersPage(orders, params = {}) {
   const filtered = orders.filter((order) => {
     if (params.status && params.status !== 'all' && order.shippingStatus !== params.status) return false;
     if (params.payment_status && order.paymentStatus !== params.payment_status) return false;
-    return !search || [order.id, getOrderLabel(order), getOrderCustomerName(order), order.customer?.email]
+    return !search || [order.id, getOrderLabel(order), getOrderCustomerName(order), order.contact?.email, order.customer?.email, order.contact?.phone]
       .some((value) => String(value || '').toLowerCase().includes(search));
   });
   const limit = Math.max(1, Math.floor(Number(params.limit) || 15));

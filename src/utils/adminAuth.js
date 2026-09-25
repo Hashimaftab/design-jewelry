@@ -35,6 +35,10 @@ export const getApiErrorMessage = (error, fallback = 'Something went wrong.') =>
   const d = error?.response?.data;
   if (!d) return error?.message || fallback;
 
+  if (Array.isArray(d.errors) && d.errors.length > 0) {
+    return [d.message, ...d.errors].filter(Boolean).join(' ');
+  }
+
   if (typeof d.message === 'string' && d.message.trim()) {
     return d.message;
   }

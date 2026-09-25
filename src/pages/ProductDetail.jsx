@@ -1,19 +1,19 @@
 import { formatStorePrice as formatMoney } from '../utils/currency';
-import { useContext, useEffect, useState } from 'react';
-import { Link, useParams, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams, Navigate } from 'react-router-dom';
 import { ArrowLeft, Check } from 'lucide-react';
 import { getCatalogProduct } from '../api/catalog.api';
-import { isValidCategory, getCategoryLabel } from '../constants/productCategories';
-import { AuthContext } from '../context/AuthContextValue';
+import { isValidCategory } from '../constants/productCategories';
+
 import { useCart } from '../context/CartContextValue';
 import { getApiErrorMessage } from '../utils/adminAuth';
+import { useLanguage } from '../context/LanguageContextValue';
 
 
 const ProductDetail = () => {
+  const { t, locale } = useLanguage();
   const { category, productId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { token } = useContext(AuthContext);
+
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ const ProductDetail = () => {
         const p = await getCatalogProduct(category, productId);
         if (cancelled) return;
         if (!p) {
-          setError('Product not found.');
+          setError(t('product.notFound'));
         } else {
           setProduct(p);
           setSelectedImageIndex(0);
@@ -45,7 +45,7 @@ const ProductDetail = () => {
           setError(
             getApiErrorMessage(
               e,
-              e?.response?.status === 404 ? 'Product not found.' : 'Could not load product.',
+              e?.response?.status === 404 ? t('product.notFound') : t('product.loadError'),
             ),
           );
         }
@@ -57,19 +57,19 @@ const ProductDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [category, productId]);
+  }, [category, productId, t]);
 
   if (!isValidCategory(category)) {
     return <Navigate to="/collections/necklaces" replace />;
   }
 
-  const label = getCategoryLabel(category);
+  const label = t(`category.${category}`);
   const listPath = `/collections/${category}`;
 
   if (loading) {
     return (
       <div className="product-detail container">
-        <p className="product-detail__status">Loading…</p>
+        <p className="product-detail__status">{t('common.loading')}</p>
       </div>
     );
   }
@@ -77,9 +77,9 @@ const ProductDetail = () => {
   if (error || !product) {
     return (
       <div className="product-detail container">
-        <p className="product-detail__error">{error || 'Product not found.'}</p>
+        <p className="product-detail__error">{error || t('product.notFound')}</p>
         <Link to={listPath} className="product-detail__back">
-          Back to {label}
+          {t('product.backTo', { category: label })}
         </Link>
       </div>
     );
@@ -87,23 +87,20 @@ const ProductDetail = () => {
 
   const stockLabel = product.inStock
     ? product.quantity <= 3
-      ? `Only ${product.quantity} left`
-      : 'In stock'
-    : 'Out of stock';
+      ? t('product.onlyLeft', { count: product.quantity })
+      : t('category.inStock')
+    : t('product.outOfStock');
 
   const handleAddToBag = async () => {
     setBagMessage('');
-    if (!token) {
-      navigate('/login', { state: { from: location.pathname } });
-      return;
-    }
+
 
     setAddingToBag(true);
     const result = await addToCart(product.id, quantity, product);
     if (result.success) {
       setJustAdded(true);
       setTimeout(() => setJustAdded(false), 2400);
-      setBagMessage('Added to your bag.');
+      setBagMessage(t('product.addedMessage'));
     } else {
       setBagMessage(result.message);
     }
@@ -120,7 +117,7 @@ const ProductDetail = () => {
       <div className="container product-detail__inner">
         <Link to={listPath} className="product-detail__back">
           <ArrowLeft size={16} />
-          Back to {label}
+          {t('product.backTo', { category: label })}
         </Link>
 
         <div className="product-detail__layout">
@@ -129,7 +126,7 @@ const ProductDetail = () => {
               {currentImage ? (
                 <img src={currentImage} alt={product.name} />
               ) : (
-                <div className="media-frame__placeholder product-detail__image-placeholder">No image</div>
+                <div className="media-frame__placeholder product-detail__image-placeholder">{t('product.noImage')}</div>
               )}
             </div>
             {images.length > 1 && (
@@ -142,7 +139,7 @@ const ProductDetail = () => {
                       selectedImageIndex === idx ? 'product-detail__gallery-thumb--active' : ''
                     }`}
                     onClick={() => setSelectedImageIndex(idx)}
-                    aria-label={`View photo ${idx + 1}`}
+                    aria-label={t('product.viewPhoto', { number: idx + 1 })}
                   >
                     <img src={img} alt="" />
                   </button>
@@ -154,29 +151,29 @@ const ProductDetail = () => {
           <div className="product-detail__info">
             <p className="product-detail__category">{label}</p>
             <h1 className="product-detail__title">{product.name}</h1>
-            <p className="product-detail__price">{formatMoney(product.price)}</p>
+            <p className="product-detail__price">{formatMoney(product.price, locale)}</p>
 
             <div
               className={`product-detail__stock ${
                 product.inStock ? 'product-detail__stock--in' : 'product-detail__stock--out'
               }`}
             >
-              <span className="product-detail__stock-label">Availability</span>
+              <span className="product-detail__stock-label">{t('product.availability')}</span>
               <span className="product-detail__stock-value">{stockLabel}</span>
               {product.inStock ? (
-                <span className="product-detail__stock-qty">{product.quantity} available</span>
+                <span className="product-detail__stock-qty">{t('product.availableCount', { count: product.quantity })}</span>
               ) : null}
             </div>
 
             <div className="product-detail__description">
-              <h2>Description</h2>
-              <p>{product.description || 'No description provided.'}</p>
+              <h2>{t('product.description')}</h2>
+              <p>{product.description || t('product.noDescription')}</p>
             </div>
 
             {product.inStock ? (
               <div className="product-detail__purchase">
                 <label className="product-detail__qty-label" htmlFor="qty">
-                  Quantity
+                  {t('product.quantity')}
                 </label>
                 <input
                   id="qty"
@@ -196,7 +193,7 @@ const ProductDetail = () => {
             {bagMessage ? (
               <p
                 className={`product-detail__bag-msg ${
-                  bagMessage.includes('Added') ? 'product-detail__bag-msg--ok' : ''
+                  bagMessage === t('product.addedMessage') ? 'product-detail__bag-msg--ok' : ''
                 }`}
               >
                 {bagMessage}
@@ -212,26 +209,26 @@ const ProductDetail = () => {
               {addingToBag ? (
                 <span className="cta-loading-content">
                   <span className="cta-gold-spinner" />
-                  <span>Adding to Bag…</span>
+                  <span>{t('product.adding')}</span>
                 </span>
               ) : justAdded ? (
                 <span className="cta-added-content">
                   <Check size={18} className="cta-check-icon" />
-                  <span>Added to Bag</span>
+                  <span>{t('product.added')}</span>
                 </span>
               ) : product.inStock ? (
                 <span className="cta-default-content">
-                  <span>Add to Bag</span>
+                  <span>{t('product.addToBag')}</span>
                   <span className="cta-btn-gleam" />
                 </span>
               ) : (
-                'Out of stock'
+                t('product.outOfStock')
               )}
             </button>
 
-            {token && product.inStock ? (
+            {product.inStock ? (
               <Link to="/checkout" className="product-detail__checkout-link">
-                View bag & checkout
+                {t('product.viewBag')}
               </Link>
             ) : null}
           </div>

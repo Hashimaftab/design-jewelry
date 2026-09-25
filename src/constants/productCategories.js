@@ -4,6 +4,7 @@ export const PRODUCT_CATEGORIES = [
   { slug: 'earrings', label: 'Earrings' },
   { slug: 'rings', label: 'Rings' },
   { slug: 'bracelets', label: 'Bracelets' },
+  { slug: 'gifts', label: 'Gifts' },
 ];
 
 const SLUG_SET = new Set(PRODUCT_CATEGORIES.map((c) => c.slug));
@@ -19,6 +20,7 @@ export const CATEGORY_DB_TO_SLUG = {
   bracelet: 'bracelets',
   earring: 'earrings',
   ring: 'rings',
+  gift: 'gifts',
 };
 
 export const CATEGORY_SLUG_TO_DB = {
@@ -26,4 +28,5 @@ export const CATEGORY_SLUG_TO_DB = {
   bracelets: 'bracelet',
   earrings: 'earring',
   rings: 'ring',
+  gifts: 'gift',
 };

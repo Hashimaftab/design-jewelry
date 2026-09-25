@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -12,11 +12,13 @@ import {
   createStripePaymentIntent,
 } from '../api/payments.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
+import { useLanguage } from '../context/LanguageContextValue';
 
 const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
-const stripePromise = publishableKey ? loadStripe(publishableKey, { locale: 'nl' }) : null;
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, onError }) {
+  const { t, locale } = useLanguage();
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
     onError('');
 
     if (!stripe || !elements) {
-      onError('Payment form is still loading. Please wait a moment.');
+      onError(t('payment.formLoading'));
       return;
     }
 
@@ -57,15 +59,15 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
 
 
       if (result?.error) {
-        const errorMessage = result.error.message || result.error.code || 'Payment failed';
-        onError(`Payment Error: ${errorMessage}`);
+        const errorMessage = result.error.message || result.error.code || t('payment.failed');
+        onError(t('payment.errorPrefix', { message: errorMessage }));
         return;
       }
 
       const paymentIntent = result?.paymentIntent;
 
       if (!paymentIntent) {
-        onError('No payment response from Stripe. Please try again.');
+        onError(t('payment.noResponse'));
         return;
       }
 
@@ -76,7 +78,7 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
       }
 
       if (paymentIntent.status === 'processing') {
-        onError('Payment is processing. Please wait...');
+        onError(t('payment.processingStatus'));
         // Optionally redirect after a delay
         setTimeout(() => {
           navigate(`/order-success/${orderId}`, { replace: true });
@@ -85,18 +87,18 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
       }
 
       if (paymentIntent.status === 'requires_payment_method') {
-        onError('Please provide valid payment details');
+        onError(t('payment.validDetails'));
         return;
       }
 
       if (paymentIntent.status === 'requires_action') {
-        onError('Payment requires authentication. Please complete the verification.');
+        onError(t('payment.authentication'));
         return;
       }
 
-      onError(`Payment status: ${paymentIntent.status}. Please contact support if this persists.`);
+      onError(t('payment.status', { status: paymentIntent.status }));
     } catch (err) {
-      onError(err?.message || 'An unexpected error occurred. Please try again.');
+      onError(err?.message || t('payment.unexpected'));
     } finally {
       setBusy(false);
     }
@@ -111,7 +113,7 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
             paymentMethodOrder: ['ideal', 'card'],
             defaultValues: {
               billingDetails: {
-                address: { country: 'NL' },
+                address: { country: billingCountry },
               },
             },
             fields: {
@@ -123,13 +125,16 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
         />
       </div>
       <button type="submit" className="pay-now-btn" disabled={!stripe || busy}>
-        {busy ? 'Processing…' : `Pay ${formatStorePrice(grandTotal)}`}
+        {busy ? t('payment.processing') : t('payment.payAmount', { amount: formatStorePrice(grandTotal, locale) })}
       </button>
     </form>
   );
 }
 
 const Payment = () => {
+  const { t, locale, language } = useLanguage();
+  const translateRef = useRef(t);
+  useEffect(() => { translateRef.current = t; }, [t]);
   const { token } = useContext(AuthContext);
   const { orderId } = useParams();
   const location = useLocation();
@@ -150,34 +155,32 @@ const Payment = () => {
   const elementsOptions = useMemo(
     () =>
       clientSecret
-        ? { clientSecret, locale: 'nl', appearance: { theme: 'stripe' } }
+        ? { clientSecret, locale: language === 'nl' ? 'nl' : 'en', appearance: { theme: 'stripe' } }
         : null,
-    [clientSecret],
+    [clientSecret, language],
   );
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login', { state: { from: location.pathname }, replace: true });
-      return;
-    }
+
 
     let cancelled = false;
 
     const load = async () => {
+      const translate = translateRef.current;
       setLoading(true);
       setError('');
 
       try {
         if (!publishableKey) {
           throw new Error(
-            'Online payment is temporarily unavailable. Please try again later.',
+            translate('payment.onlineUnavailable'),
           );
         }
 
         const configRes = await getStoreConfig();
         const config = configRes?.store ?? configRes;
         if (config?.currencyCode && config.currencyCode.toUpperCase() !== 'EUR') {
-          throw new Error('Euro payments are temporarily unavailable. Please contact support.');
+          throw new Error(translate('payment.euroUnavailable'));
         }
         const diagnostics = configRes?.payments ?? null;
         const orderSummary = await getOrderPaymentSummary(orderId, token);
@@ -189,9 +192,10 @@ const Payment = () => {
         }
 
         const intent = await createStripePaymentIntent(orderId, token);
+        if (cancelled) return;
         if (!intent?.clientSecret) {
           throw new Error(
-            'Could not start your payment session. Please try again.',
+            translate('payment.startError'),
           );
         }
 
@@ -204,7 +208,7 @@ const Payment = () => {
         const message =
           err instanceof ApiRequestError
             ? err.message
-            : getApiErrorMessage(err, 'Could not load payment details.');
+            : getApiErrorMessage(err, translate('payment.loadError'));
         setError(message);
       } finally {
         if (!cancelled) {
@@ -224,7 +228,7 @@ const Payment = () => {
     return (
       <div className="checkout-page">
         <div className="checkout-container container">
-          <p className="checkout-status">Loading payment details…</p>
+          <p className="checkout-status">{t('payment.loading')}</p>
         </div>
       </div>
     );
@@ -235,11 +239,12 @@ const Payment = () => {
       <div className="checkout-page">
         <div className="checkout-container container">
           <p className="checkout-alert checkout-alert--error">
-            {error || 'Payment session unavailable.'}
+            {error || t('payment.sessionUnavailable')}
           </p>
           <Link to="/checkout" className="pay-now-btn">
-            Back to bag
+            {t('payment.backToBag')}
           </Link>
+          <button type="button" className="pay-now-btn" onClick={() => window.location.reload()}>{t('payment.retry')}</button>
         </div>
       </div>
     );
@@ -252,21 +257,21 @@ const Payment = () => {
           <header className="checkout-header">
             <Link to="/checkout" className="back-link">
               <ArrowLeft size={16} />
-              <span>Back to bag</span>
+              <span>{t('payment.backToBag')}</span>
             </Link>
-            <h1 className="checkout-logo">Payment</h1>
+            <h1 className="checkout-logo">{t('payment.title')}</h1>
           </header>
 
           <section className="form-section">
-            <h2>Order payment</h2>
+            <h2>{t('payment.orderPayment')}</h2>
+            <p className="form-desc">{t('payment.orderPlaced')}</p>
             <p className="form-desc">
-              Pay securely with iDEAL | Wero or card (Visa, Mastercard). Payment details are
-              handled by Stripe and never touch our servers.
+              {t('payment.secureText')}
             </p>
 
             {paymentDiagnostics && !paymentDiagnostics.idealTestIntentOk ? (
               <p className="checkout-alert checkout-alert--error">
-                iDEAL is temporarily unavailable. Please choose card payment.
+                {t('payment.idealUnavailable')}
               </p>
             ) : null}
 
@@ -275,30 +280,30 @@ const Payment = () => {
             <div className="summary-card">
               <div className="summary-items">
                 <div className="summary-item">
-                  <span>Order</span>
+                  <span>{t('payment.order')}</span>
                   <strong>#{orderId?.slice(0, 8)}</strong>
                 </div>
                 <div className="summary-item">
-                  <span>Subtotal</span>
-                  <strong>{formatStorePrice(summary.subtotalAmount)}</strong>
+                  <span>{t('payment.subtotal')}</span>
+                  <strong>{formatStorePrice(summary.subtotalAmount, locale)}</strong>
                 </div>
                 {summary.vatAmount > 0 ? (
                   <div className="summary-item">
                     <span>
                       {summary.vatLabel} ({summary.vatRatePercent}%)
                     </span>
-                    <strong>{formatStorePrice(summary.vatAmount)}</strong>
+                    <strong>{formatStorePrice(summary.vatAmount, locale)}</strong>
                   </div>
                 ) : null}
                 {summary.shippingAmount > 0 ? (
                   <div className="summary-item">
-                    <span>Shipping</span>
-                    <strong>{formatStorePrice(summary.shippingAmount)}</strong>
+                    <span>{t('payment.shipping')}</span>
+                    <strong>{formatStorePrice(summary.shippingAmount, locale)}</strong>
                   </div>
                 ) : null}
                 <div className="summary-item grand-total">
-                  <span>Total</span>
-                  <strong>{formatStorePrice(summary.grandTotalAmount)}</strong>
+                  <span>{t('payment.total')}</span>
+                  <strong>{formatStorePrice(summary.grandTotalAmount, locale)}</strong>
                 </div>
               </div>
             </div>
@@ -316,7 +321,7 @@ const Payment = () => {
               </Elements>
             ) : (
               <p className="checkout-alert checkout-alert--error">
-                Stripe publishable key is missing.
+                {t('payment.missingKey')}
               </p>
             )}
           </section>
@@ -324,22 +329,22 @@ const Payment = () => {
 
         <aside className="checkout-sidebar">
           <div className="summary-card">
-            <h3>Store info</h3>
+            <h3>{t('payment.storeInfo')}</h3>
             <div className="summary-item">
-              <span>Country</span>
+              <span>{t('payment.country')}</span>
               <strong>{storeConfig?.countryCode ?? 'NL'}</strong>
             </div>
             <div className="summary-item">
-              <span>Locale</span>
+              <span>{t('payment.locale')}</span>
               <strong>{storeConfig?.locale ?? 'nl-NL'}</strong>
             </div>
             <div className="summary-item">
-              <span>Currency</span>
+              <span>{t('payment.currency')}</span>
               <strong>{storeConfig?.currencyCode?.toUpperCase() ?? 'EUR'}</strong>
             </div>
             {storeConfig?.vatRatePercent > 0 ? (
               <div className="summary-item">
-                <span>VAT</span>
+                <span>{t('payment.vat')}</span>
                 <strong>
                   {storeConfig.vatRatePercent}% {storeConfig.vatLabel}
                 </strong>

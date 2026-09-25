@@ -490,7 +490,7 @@ const AdminOrders = () => {
             ) : (
               orders.map((order) => {
                 const customerName = getOrderCustomerName(order);
-                const customerEmail = order.customer?.email || '—';
+                const customerEmail = order.contact?.email || order.customer?.email || '—';
                 const itemsCount = (order.items || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
                 const isUpdating = updatingId === order.id;
 
@@ -733,16 +733,16 @@ const AdminOrders = () => {
                     <div>
                       <span className="detail-label">Email</span>
                       <span className="detail-value">
-                        {selectedOrder.customer?.email ||
-                          selectedOrder.shipping_address?.email ||
+                        {selectedOrder.contact?.email || selectedOrder.customer?.email ||
+                          selectedOrder.contact?.email ||
                           '—'}
                       </span>
                     </div>
                     <div>
                       <span className="detail-label">Phone</span>
                       <span className="detail-value">
-                        {selectedOrder.customer?.phone ||
-                          selectedOrder.shipping_address?.phone ||
+                        {selectedOrder.contact?.phone || selectedOrder.customer?.phone ||
+                          selectedOrder.contact?.phone ||
                           '—'}
                       </span>
                     </div>
@@ -761,27 +761,27 @@ const AdminOrders = () => {
                     <MapPin size={16} />
                     <span>Shipping Destination</span>
                   </h4>
-                  {selectedOrder.shipping_address ? (
+                  {selectedOrder.contact ? (
                     <address className="address-block">
                       <p className="address-recipient">
-                        {selectedOrder.shipping_address.full_name}
+                        {selectedOrder.contact.fullName}
                       </p>
-                      <p>{selectedOrder.shipping_address.address_line1}</p>
-                      {selectedOrder.shipping_address.address_line2 ? (
-                        <p>{selectedOrder.shipping_address.address_line2}</p>
+                      <p>{selectedOrder.contact.addressLine1}</p>
+                      {selectedOrder.contact.addressLine2 ? (
+                        <p>{selectedOrder.contact.addressLine2}</p>
                       ) : null}
                       <p>
                         {[
-                          selectedOrder.shipping_address.city,
-                          selectedOrder.shipping_address.state,
-                          selectedOrder.shipping_address.postal_code,
+                          selectedOrder.contact.city,
+                          selectedOrder.contact.state,
+                          selectedOrder.contact.postalCode,
                         ]
                           .filter(Boolean)
                           .join(', ')}
                       </p>
-                      {selectedOrder.shipping_address.country ? (
+                      {selectedOrder.contact.country ? (
                         <p className="address-country">
-                          {selectedOrder.shipping_address.country}
+                          {selectedOrder.contact.country}
                         </p>
                       ) : null}
                     </address>
@@ -834,6 +834,7 @@ const AdminOrders = () => {
                             </div>
                             <div className="modal-item-body">
                               <h5 className="modal-item-name">{title}</h5>
+                              {item.productDescription ? <p>{item.productDescription}</p> : null}
                               <div className="modal-item-meta">
                                 {sku ? <span className="modal-item-sku">SKU: {sku}</span> : null}
                                 {item.productCategory ? <span>{item.productCategory}</span> : null}

@@ -4,23 +4,27 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import { AdminAuthProvider } from './context/AdminAuthContext'
+import { LanguageProvider } from './context/LanguageContext'
 import './index.css'
 import App from './App.jsx'
 import './styles/pages.css'
 import './styles/refinements.css'
 import './styles/admin-theme.css'
 import './styles/home-campaigns.css'
+import './styles/responsive.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <AdminAuthProvider>
-            <App />
-          </AdminAuthProvider>
-        </CartProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AdminAuthProvider>
+              <App />
+            </AdminAuthProvider>
+          </CartProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   </StrictMode>,
 )

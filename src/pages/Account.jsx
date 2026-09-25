@@ -6,8 +6,10 @@ import { Mail, Shield, RefreshCcw, BadgeCheck } from 'lucide-react';
 import { getUserDisplayName } from '../api/authHelpers';
 import { listMyOrders } from '../api/cart.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
+import { useLanguage } from '../context/LanguageContextValue';
 
 const Account = () => {
+  const { t, locale } = useLanguage();
   const { user, logout, refreshUser, sessionError } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -26,7 +28,7 @@ const Account = () => {
         if (!cancelled) setOrders(list);
       } catch (e) {
         if (!cancelled) {
-          setOrdersError(getApiErrorMessage(e, 'Could not load orders.'));
+          setOrdersError(getApiErrorMessage(e, t('account.loadOrdersError')));
         }
       } finally {
         if (!cancelled) setOrdersLoading(false);
@@ -36,10 +38,16 @@ const Account = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   const displayName = getUserDisplayName(user);
   const initial = (user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'H').toUpperCase();
+  const translatedRole = user?.role === 'customer' || !user?.role ? t('common.customer') : user.role;
+  const translateStatus = (status) => {
+    const key = `status.${status}`;
+    const translated = t(key);
+    return translated === key ? status : translated;
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -63,7 +71,7 @@ const Account = () => {
           marginBottom: '2rem',
         }}
       >
-        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem' }}>My Profile</h1>
+        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem' }}>{t('account.profile')}</h1>
         <button
           onClick={handleRefresh}
           className={`refresh-btn ${isRefreshing ? 'spinning' : ''}`}
@@ -79,7 +87,7 @@ const Account = () => {
           }}
         >
           <RefreshCcw size={16} />
-          Refresh Info
+          {t('account.refresh')}
         </button>
       </div>
 
@@ -130,7 +138,7 @@ const Account = () => {
               color: 'var(--gold-light)',
             }}
           >
-            {user?.role || 'customer'}
+            {translatedRole}
           </span>
         </div>
 
@@ -148,7 +156,7 @@ const Account = () => {
                   display: 'block',
                 }}
               >
-                Email Address
+                {t('account.email')}
               </label>
               <span style={{ fontSize: '1rem' }}>{user?.email}</span>
             </div>
@@ -167,10 +175,10 @@ const Account = () => {
                   display: 'block',
                 }}
               >
-                Email verified
+                {t('account.emailVerified')}
               </label>
               <span style={{ fontSize: '1rem' }}>
-                {user?.emailVerified ? 'Yes' : 'Not yet verified'}
+                {user?.emailVerified ? t('common.yes') : t('common.notVerified')}
               </span>
             </div>
           </div>
@@ -188,11 +196,11 @@ const Account = () => {
                   display: 'block',
                 }}
               >
-                Account access
+                {t('account.access')}
               </label>
               <span style={{ fontSize: '1rem' }}>
-                {user?.isActive === false ? 'Inactive' : 'Active'} ·{' '}
-                {user?.role || 'customer'}
+                {user?.isActive === false ? t('common.inactive') : t('common.active')} ·{' '}
+                {translatedRole}
               </span>
             </div>
           </div>
@@ -221,7 +229,7 @@ const Account = () => {
                 e.currentTarget.style.backgroundColor = '#211b17';
               }}
             >
-              Sign Out
+              {t('account.signOut')}
             </button>
             <button
               style={{
@@ -238,7 +246,7 @@ const Account = () => {
                 transition: 'all 0.3s ease',
               }}
             >
-              Edit Profile
+              {t('account.editProfile')}
             </button>
           </div>
         </div>
@@ -254,10 +262,10 @@ const Account = () => {
             letterSpacing: '0.02em',
           }}
         >
-          Order History
+          {t('account.orderHistory')}
         </h2>
         {ordersLoading ? (
-          <p style={{ color: 'var(--color-text-secondary)' }}>Loading orders…</p>
+          <p style={{ color: 'var(--color-text-secondary)' }}>{t('account.loadingOrders')}</p>
         ) : ordersError ? (
           <p style={{ color: '#dc2626', fontSize: '0.9rem' }}>{ordersError}</p>
         ) : orders.length === 0 ? (
@@ -270,7 +278,7 @@ const Account = () => {
               border: '1px dashed var(--border-gold)',
             }}
           >
-            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>No orders yet.</p>
+            <p style={{ color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>{t('account.noOrders')}</p>
             <button
               onClick={() => navigate('/collections/necklaces')}
               style={{
@@ -294,7 +302,7 @@ const Account = () => {
                 e.currentTarget.style.backgroundColor = '#211b17';
               }}
             >
-              Explore Collections
+              {t('checkout.explore')}
             </button>
           </div>
         ) : (
@@ -321,7 +329,7 @@ const Account = () => {
                     #{String(order.id ?? '').slice(0, 8)}
                   </strong>
                   <span style={{ marginLeft: '1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString(locale) : ''}
                   </span>
                   <span
                     style={{
@@ -346,11 +354,11 @@ const Account = () => {
                       }`,
                     }}
                   >
-                    {order.status}
+                    {translateStatus(order.status)}
                   </span>
                 </div>
                 <span style={{ fontWeight: 600, fontSize: '1.15rem', color: 'var(--gold-primary)' }}>
-                  {formatMoney(order.totalAmount)}
+                  {formatMoney(order.totalAmount, locale)}
                 </span>
               </li>
             ))}

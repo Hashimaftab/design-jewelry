@@ -3,11 +3,13 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, X, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContextValue';
+import { useLanguage } from '../context/LanguageContextValue';
 import './CartToast.css';
 
 
 const CartToast = () => {
   const { cartToast, dismissToast } = useCart();
+  const { t, locale } = useLanguage();
 
   useEffect(() => {
     if (!cartToast) return;
@@ -25,13 +27,13 @@ const CartToast = () => {
         <div className="cart-toast__header">
           <div className="cart-toast__badge">
             <Sparkles size={14} className="cart-toast__sparkle" />
-            <span>Added to Your Bag</span>
+            <span>{t('cart.added')}</span>
           </div>
           <button
             type="button"
             className="cart-toast__close"
             onClick={dismissToast}
-            aria-label="Close notification"
+            aria-label={t('cart.closeNotification')}
           >
             <X size={15} />
           </button>
@@ -54,7 +56,7 @@ const CartToast = () => {
             {cartToast.price ? (
               <p className="cart-toast__price">
                 {cartToast.quantity > 1 ? `${cartToast.quantity} × ` : ''}
-                {formatMoney(cartToast.price)}
+                {formatMoney(cartToast.price, locale)}
               </p>
             ) : null}
           </div>
@@ -66,7 +68,7 @@ const CartToast = () => {
             className="cart-toast__btn"
             onClick={dismissToast}
           >
-            <span>View Bag & Checkout</span>
+            <span>{t('cart.viewCheckout')}</span>
             <span className="cart-toast__btn-gleam" />
           </Link>
         </div>

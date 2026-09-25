@@ -1,11 +1,12 @@
 /**
- * Customer shopping bag & checkout — Bearer token required
+ * Customer shopping bag uses Bearer authentication; POST /orders also accepts guests.
  * GET/DELETE /cart, POST /cart/items, PATCH/DELETE /cart/items/:productId
  * POST /cart/checkout, GET /cart/orders
  */
 
 import axiosInstance from './axiosInstance';
 import { CART_ROUTES } from './config';
+import { orderHeaders } from './orderAccess';
 import {
   parseCartResponse,
   parseOrderResponse,
@@ -50,8 +51,12 @@ export const removeFromCart = async (productId) => {
 };
 
 /** @returns {Promise<ReturnType<parseOrderResponse>>} */
-export const checkoutCart = async () => {
-  const res = await axiosInstance.post(CART_ROUTES.checkout);
+export const checkoutCart = async (payload) => {
+  const res = await axiosInstance.post('/orders', payload);
+  if (!res?.data?.order?.id) throw new Error('Order response was incomplete. Please retry with the same checkout details.');
+  if (res.data?.guestOrderToken) {
+    sessionStorage.setItem(`husan_order_${res.data.order.id}`, res.data.guestOrderToken);
+  }
   return parseOrderResponse(res);
 };
 
@@ -63,6 +68,6 @@ export const listMyOrders = async () => {
 
 /** @param {string} orderId */
 export const getMyOrder = async (orderId) => {
-  const res = await axiosInstance.get(CART_ROUTES.order(orderId));
+  const res = await axiosInstance.get(`/orders/${orderId}`, { headers: orderHeaders(orderId) });
   return parseOrderResponse(res);
 };

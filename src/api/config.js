@@ -21,6 +21,7 @@ export const USER_ROUTES = {
 
 /** Public storefront catalog — GET /products/{category} */
 export const CATALOG_ROUTES = {
+  all: '/products',
   list: (category) => `/products/${category}`,
   detail: (category, id) => `/products/${category}/${id}`,
 };

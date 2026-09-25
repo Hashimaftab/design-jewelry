@@ -52,8 +52,8 @@ const AdminDashboard = () => {
     },
     {
       label: 'Collections',
-      value: '4',
-      hint: 'Necklaces, earrings, rings, bracelets',
+      value: '5',
+      hint: 'Necklaces, earrings, rings, bracelets, gifts',
       icon: Sparkles,
       link: '/admin/products/necklaces',
     },

@@ -13,6 +13,7 @@ import {
 import { getApiErrorMessage } from '../utils/adminAuth';
 
 import { AuthContext } from './AuthContextValue';
+import { useLanguage } from './LanguageContextValue';
 
 function persistSession({ user, accessToken, refreshToken }) {
   if (accessToken) localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
@@ -21,6 +22,7 @@ function persistSession({ user, accessToken, refreshToken }) {
 }
 
 export const AuthProvider = ({ children }) => {
+  const { t } = useLanguage();
   const [token, setToken] = useState(() => localStorage.getItem(ACCESS_TOKEN_KEY));
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem(USER_KEY);
@@ -63,7 +65,7 @@ export const AuthProvider = ({ children }) => {
           if (error.response?.status === 401) {
             clearSession();
           } else {
-            setSessionError('We could not refresh your profile. Please try again.');
+            setSessionError(t('auth.profileRefreshError'));
           }
         }
       }
@@ -71,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     verifySession();
-  }, [token, clearSession]);
+  }, [token, clearSession, t]);
 
   const applySession = useCallback((session) => {
     setToken(session.accessToken);
@@ -87,11 +89,11 @@ export const AuthProvider = ({ children }) => {
         applySession(session);
         return { success: true };
       }
-      return { success: false, message: 'Login failed. Invalid server response.' };
+      return { success: false, message: t('auth.loginInvalidResponse') };
     } catch (error) {
       return {
         success: false,
-        message: getApiErrorMessage(error, 'Login failed. Please check your credentials.'),
+        message: getApiErrorMessage(error, t('auth.loginFailed')),
       };
     }
   };
@@ -104,11 +106,11 @@ export const AuthProvider = ({ children }) => {
         applySession(session);
         return { success: true };
       }
-      return { success: false, message: 'Registration failed. Invalid server response.' };
+      return { success: false, message: t('auth.registrationInvalidResponse') };
     } catch (error) {
       return {
         success: false,
-        message: getApiErrorMessage(error, 'Registration failed.'),
+        message: getApiErrorMessage(error, t('auth.registrationFailed')),
       };
     }
   };
@@ -136,7 +138,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem(USER_KEY, JSON.stringify(me));
       }
     } catch {
-      setSessionError('We could not refresh your profile. Please try again.');
+      setSessionError(t('auth.profileRefreshError'));
     }
   };
 

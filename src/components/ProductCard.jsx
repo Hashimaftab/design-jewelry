@@ -2,10 +2,12 @@ import { formatStorePrice as formatMoney } from '../utils/currency';
 import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContextValue';
 import './ProductCard.css';
 
 
 const ProductCard = ({ product, categorySlug }) => {
+  const { t, locale } = useLanguage();
   const slug = categorySlug ?? product.categorySlug ?? product.category;
   const detailPath = `/collections/${slug}/${product.id}`;
 
@@ -42,7 +44,7 @@ const ProductCard = ({ product, categorySlug }) => {
               {secondaryImage && (
                 <img
                   src={secondaryImage}
-                  alt={`${product.name} alternate view`}
+                  alt={t('product.alternateView', { name: product.name })}
                   className="product-card__img product-card__img--secondary"
                   loading="lazy"
                   decoding="async"
@@ -53,20 +55,20 @@ const ProductCard = ({ product, categorySlug }) => {
             <div className="media-frame__placeholder" aria-hidden />
           )}
           {!product.inStock ? (
-            <span className="product-card__badge product-card__badge--out">Out of stock</span>
+            <span className="product-card__badge product-card__badge--out">{t('product.outOfStock')}</span>
           ) : product.quantity <= 3 ? (
-            <span className="product-card__badge">Only {product.quantity} left</span>
+            <span className="product-card__badge">{t('product.onlyLeft', { count: product.quantity })}</span>
           ) : null}
           <div className="quick-add-container">
             <span className="quick-add-btn">
-              <span>View details</span>
+              <span>{t('product.viewDetails')}</span>
               <Plus size={16} />
             </span>
           </div>
         </div>
         <div className="product-info">
           <h3 className="product-name">{product.name}</h3>
-          <p className="product-price">{formatMoney(product.price)}</p>
+          <p className="product-price">{formatMoney(product.price, locale)}</p>
         </div>
       </Link>
     </Motion.article>

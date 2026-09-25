@@ -1,6 +1,6 @@
 /**
  * Public storefront catalog — no auth required
- * GET /api/v1/products/{necklaces|bracelets|earrings|rings}
+ * GET /api/v1/products/{necklaces|bracelets|earrings|rings|gifts}
  */
 
 import axiosInstance from './axiosInstance';
@@ -26,7 +26,20 @@ export const CATALOG_ENDPOINTS = {
 };
 
 /**
- * @param {'necklaces'|'bracelets'|'earrings'|'rings'} categorySlug
+ * All categories combined, newest first.
+ * @param {{ page?: number, limit?: number, search?: string, inStockOnly?: boolean }} [params]
+ */
+export const listAllCatalogProducts = async (params = {}) => {
+  const query = { ...params };
+  if (query.inStockOnly) {
+    query.inStockOnly = true;
+  }
+  const res = await axiosInstance.get(CATALOG_ROUTES.all, { params: query });
+  return parseListResponse(res);
+};
+
+/**
+ * @param {'necklaces'|'bracelets'|'earrings'|'rings'|'gifts'} categorySlug
  * @param {{ page?: number, limit?: number, search?: string, inStockOnly?: boolean }} [params]
  */
 export const listCatalogProducts = async (categorySlug, params = {}) => {
@@ -39,7 +52,7 @@ export const listCatalogProducts = async (categorySlug, params = {}) => {
 };
 
 /**
- * @param {'necklaces'|'bracelets'|'earrings'|'rings'} categorySlug
+ * @param {'necklaces'|'bracelets'|'earrings'|'rings'|'gifts'} categorySlug
  * @param {string} productId
  */
 export const getCatalogProduct = async (categorySlug, productId) => {

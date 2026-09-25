@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -10,9 +10,12 @@ import AdminPrivateRoute from './components/AdminPrivateRoute';
 import AdminPublicRoute from './components/AdminPublicRoute';
 
 import CartToast from './components/CartToast';
+import LanguageSwitcher from './components/LanguageSwitcher';
+import { useLanguage } from './context/LanguageContextValue';
 import './App.css';
 
 const Category = lazy(() => import('./pages/Category'));
+const AllProducts = lazy(() => import('./pages/AllProducts'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Login = lazy(() => import('./pages/Login'));
@@ -20,6 +23,7 @@ const Signup = lazy(() => import('./pages/Signup'));
 const Account = lazy(() => import('./pages/Account'));
 const Payment = lazy(() => import('./pages/Payment'));
 const OrderSuccess = lazy(() => import('./pages/OrderSuccess'));
+const LegalPage = lazy(() => import('./pages/LegalPage'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -30,26 +34,41 @@ const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 
 function App() {
   const location = useLocation();
+  const { t, language } = useLanguage();
+  const isAdmin = location.pathname.startsWith('/admin');
   const hideNavbarFooter =
     ['/checkout', '/login', '/signup'].includes(location.pathname) ||
-    location.pathname.startsWith('/admin');
+    isAdmin;
+
+  useEffect(() => {
+    document.documentElement.lang = isAdmin ? 'en' : language;
+  }, [isAdmin, language]);
+
+  const storefrontText = (key, adminEnglish) => isAdmin ? adminEnglish : t(key);
 
   return (
     <>
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <CartToast />
+      <a className="skip-link" href="#main-content">{storefrontText('app.skipToContent', 'Skip to content')}</a>
+      {!isAdmin && <CartToast />}
       {!hideNavbarFooter && <Navbar />}
+      {hideNavbarFooter && !isAdmin ? <LanguageSwitcher floating /> : null}
       <main id="main-content">
-        <Suspense fallback={<p className="route-loading" role="status">Loading…</p>}>
+        <Suspense fallback={<p className="route-loading" role="status">{storefrontText('common.loading', 'Loading…')}</p>}>
         <Routes>
-          <Route path="*" element={<div className="not-found container"><h1>Page not found</h1><p>Let’s find something beautiful instead.</p><a className="btn btn-primary" href="/">Return to store</a></div>} />
+          <Route path="*" element={<div className="not-found container"><h1>{storefrontText('app.pageNotFound', 'Page not found')}</h1><p>{storefrontText('app.pageNotFoundText', 'Let’s find something beautiful instead.')}</p><a className="btn btn-primary" href="/">{storefrontText('app.returnToStore', 'Return to store')}</a></div>} />
           {/* Public Routes */}
           <Route path="/" element={<Home />} />
+          <Route path="/collections/all" element={<AllProducts />} />
+          <Route path="/new-arrivals" element={<AllProducts variant="new" />} />
           <Route path="/collections/:category" element={<Category />} />
           <Route path="/collections/:category/:productId" element={<ProductDetail />} />
-          <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
-          <Route path="/payments/:orderId" element={<PrivateRoute><Payment /></PrivateRoute>} />
-          <Route path="/order-success/:orderId" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payments/:orderId" element={<Payment />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+          <Route path="/privacy-policy" element={<LegalPage policy="privacy" />} />
+          <Route path="/shipping-policy" element={<LegalPage policy="shipping" />} />
+          <Route path="/return-policy" element={<LegalPage policy="returns" />} />
+          <Route path="/terms-of-service" element={<LegalPage policy="terms" />} />
 
           {/* Auth Layout (Public Routes for unauthenticated users) */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

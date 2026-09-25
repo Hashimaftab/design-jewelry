@@ -27,6 +27,7 @@ export function clearUserSession() {
 
 function shouldAttemptRefresh(config) {
   if (!config) return false;
+  if (config.skipCustomerAuth || config.headers?.['X-Order-Token'] || !config.headers?.Authorization) return false;
   const url = config.url || '';
   if (url.includes(USER_ROUTES.refreshToken)) return false;
   if (url.includes(USER_ROUTES.login)) return false;
@@ -37,7 +38,9 @@ function shouldAttemptRefresh(config) {
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (token) {
+    if (config.skipCustomerAuth || config.headers['X-Order-Token']) {
+      delete config.headers.Authorization;
+    } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

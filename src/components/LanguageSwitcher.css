@@ -1,0 +1,51 @@
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: currentColor;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.language-switcher button {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  opacity: 0.58;
+}
+
+.language-switcher button.is-active {
+  opacity: 1;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.28rem;
+}
+
+.language-switcher--floating {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1200;
+  padding: 0.3rem 0.55rem;
+  color: #29241f;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(151, 115, 45, 0.35);
+  box-shadow: 0 4px 18px rgba(40, 30, 20, 0.1);
+}
+
+.nav-mobile-menu > .language-switcher { display: none; }
+
+@media (max-width: 768px) {
+  .language-switcher--floating { top: 0.5rem; right: 0.5rem; }
+  .nav-actions > .language-switcher { display: none; }
+  .nav-mobile-menu > .language-switcher {
+    display: inline-flex;
+    margin: 0.75rem 1.25rem 1.25rem;
+  }
+}
+

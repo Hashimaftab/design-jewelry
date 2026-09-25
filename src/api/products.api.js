@@ -1,7 +1,7 @@
 /**
  * Admin products API — /api/v1/admin/products/{category}
  *
- * Categories: necklaces | bracelets | earrings | rings
+ * Categories: necklaces | bracelets | earrings | rings | gifts
  */
 
 import adminAxiosInstance from './adminAxiosInstance';

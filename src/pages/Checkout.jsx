@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Minus, Plus, Trash2, ShieldCheck, Sparkles, MapPin } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
@@ -7,20 +7,30 @@ import { AuthContext } from '../context/AuthContextValue';
 import { getCategoryLabel } from '../constants/productCategories';
 import BrandLogo from '../components/BrandLogo';
 import { formatStorePrice } from '../api/payments.api';
-import { ordersApi } from '../api/ordersApiClient';
+import { checkoutPayload, prepareCheckoutAttempt, readCheckoutAttempt, clearCheckoutAttempt } from '../utils/checkoutAttempt';
+import { useLanguage } from '../context/LanguageContextValue';
+
 
 const Checkout = () => {
-  const { cart, loading, updateQuantity, removeItem, clearBag, placeOrder: fallbackPlaceOrder } = useCart();
+  const { t, locale, language } = useLanguage();
+  const getLocalizedCategoryLabel = (slug) => {
+    const key = `category.${slug}`;
+    const translated = t(key);
+    return translated === key ? getCategoryLabel(slug) : translated;
+  };
+  const { cart, loading, cartError, refreshCart, updateQuantity, removeItem, placeOrder } = useCart();
   const { user } = useContext(AuthContext) || {};
+  const submitting = useRef(false);
+  const owner = user?.id || 'guest';
   const [busyId, setBusyId] = useState(null);
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [error, setError] = useState('');
-  const [confirmedOrder, setConfirmedOrder] = useState(null);
+
   const navigate = useNavigate();
 
   // Shipping Address Form State
-  const [shippingForm, setShippingForm] = useState({
-    fullName: user?.name || '',
+  const [shippingForm, setShippingForm] = useState(() => ({
+    fullName: user?.name || [user?.firstName, user?.lastName].filter(Boolean).join(' '),
     email: user?.email || '',
     phone: user?.phone || '',
     addressLine1: '',
@@ -28,10 +38,11 @@ const Checkout = () => {
     city: '',
     state: '',
     postalCode: '',
-    country: 'United States',
-    paymentMethod: 'credit_card',
+    country: language === 'nl' ? 'Nederland' : 'Netherlands',
     notes: '',
-  });
+    ...readCheckoutAttempt(owner)?.payload?.contact,
+    ...(readCheckoutAttempt(owner) ? { notes: readCheckoutAttempt(owner).payload.notes } : {}),
+  }));
 
   const handleInputChange = (field, value) => {
     setShippingForm((prev) => ({ ...prev, [field]: value }));
@@ -57,132 +68,24 @@ const Checkout = () => {
     if (e) e.preventDefault();
     setError('');
 
-    // Validation
-    if (!shippingForm.fullName.trim()) {
-      setError('Please provide your full name for delivery.');
-      return;
-    }
-    if (!shippingForm.email.trim()) {
-      setError('Please provide a valid contact email for order confirmation.');
-      return;
-    }
-    if (!shippingForm.phone.trim()) {
-      setError('Please provide a contact phone number for insured courier delivery.');
-      return;
-    }
-    if (!shippingForm.addressLine1.trim() || !shippingForm.city.trim() || !shippingForm.postalCode.trim()) {
-      setError('Please complete the delivery address (Street, City, and Postal Code are required).');
-      return;
-    }
-
+    if (submitting.current || loading || busyId !== null || cartError) return;
+    submitting.current = true;
     setCheckoutBusy(true);
-
     try {
-      // Build order payload matching backend API specification
-      const orderPayload = {
-        items: cart.items.map((line) => {
-          const rawId = line.product?.id ?? line.productId;
-          const numId = parseInt(rawId, 10);
-          return {
-            product_id: isNaN(numId) ? 1 : numId,
-            quantity: Number(line.quantity) || 1,
-            ring_size: line.ringSize || line.ring_size || 7,
-          };
-        }),
-        shipping_address: {
-          full_name: shippingForm.fullName.trim(),
-          email: shippingForm.email.trim(),
-          phone: shippingForm.phone.trim(),
-          address_line1: shippingForm.addressLine1.trim(),
-          address_line2: shippingForm.addressLine2.trim() || null,
-          city: shippingForm.city.trim(),
-          state: shippingForm.state.trim() || null,
-          postal_code: shippingForm.postalCode.trim(),
-          country: shippingForm.country.trim() || 'United States',
-        },
-        payment_method: shippingForm.paymentMethod || 'credit_card',
-        notes: shippingForm.notes.trim() || null,
-      };
-
-      let res;
-      try {
-        res = await ordersApi.placeOrder(orderPayload);
-      } catch (apiErr) {
-        // If the primary orders API endpoint is unavailable, attempt the fallback placeOrder
-        if (fallbackPlaceOrder) {
-          const fallbackRes = await fallbackPlaceOrder();
-          if (fallbackRes.success && fallbackRes.order?.id) {
-            navigate(`/payments/${fallbackRes.order.id}`);
-            return;
-          }
-        }
-        throw apiErr;
-      }
-
-      const orderData = res?.data || res?.order || {};
-      setConfirmedOrder(orderData);
-
-      // Clear the local shopping bag on successful order placement
-      if (clearBag) {
-        await clearBag();
-      }
+      const payload = prepareCheckoutAttempt(checkoutPayload(shippingForm, cart.items), owner);
+      const result = await placeOrder(payload);
+      if (!result.success || !result.order?.id) throw new Error(result.message || t('checkout.placeError'));
+      clearCheckoutAttempt();
+      navigate(`/payments/${result.order.id}`, { replace: true });
     } catch (err) {
-      setError(err.message || 'An error occurred while placing your order. Please try again.');
+      setError(err.message || t('checkout.placeError'));
     } finally {
+      submitting.current = false;
       setCheckoutBusy(false);
     }
   };
 
-  const isEmpty = !loading && cart.items.length === 0;
-
-  // Render Confirmation Screen when order is successfully placed
-  if (confirmedOrder) {
-    const orderNumber = confirmedOrder.order_number || `#HUS-${confirmedOrder.id || '2026-CONFIRMED'}`;
-    const totalPaid = confirmedOrder.total || confirmedOrder.subtotal || cart.subtotal;
-
-    return (
-      <div className="checkout-page">
-        <div className="checkout-container container checkout-container--narrow">
-          <div className="checkout-success">
-            <div className="checkout-success__icon-wrap">
-              <div className="checkout-success__ring-pulse" aria-hidden="true" />
-              <div className="checkout-success__icon">
-                <svg className="success-svg" viewBox="0 0 52 52">
-                  <circle className="success-svg__circle" cx="26" cy="26" r="24" fill="none" />
-                  <path className="success-svg__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-                </svg>
-              </div>
-            </div>
-
-            <h1>Order Confirmed</h1>
-            <p className="checkout-success__sub">
-              Thank you for acquiring from HUSAN Luxury Jewelry. Your bespoke order{' '}
-              <strong>{orderNumber}</strong> has been received and our master artisans have begun preparation.
-            </p>
-
-            <div className="checkout-success__total-badge">
-              <span>Total Investment</span>
-              <strong>{formatStorePrice(totalPaid)}</strong>
-            </div>
-
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', maxWidth: '28rem', margin: '0 auto 1.5rem', lineHeight: 1.5 }}>
-              A confirmation and fulfillment notice has been dispatched to <strong>{shippingForm.email}</strong> and store concierge.
-            </p>
-
-            <div className="checkout-success__actions">
-              <Link to="/" className="pay-now-btn checkout-success__btn">
-                <span>Continue Browsing</span>
-                <span className="pay-btn-gleam" />
-              </Link>
-              <Link to="/admin/orders" className="checkout-success__link">
-                Inspect in Admin Ledger
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const isEmpty = !loading && !cartError && cart.items.length === 0;
 
   return (
     <div className="checkout-page">
@@ -191,7 +94,7 @@ const Checkout = () => {
           <header className="checkout-header">
             <Link to="/" className="back-link">
               <ArrowLeft size={16} />
-              <span>Return to Boutique</span>
+              <span>{t('checkout.returnBoutique')}</span>
             </Link>
             <Link to="/" style={{ display: 'inline-flex', alignItems: 'center' }}>
               <BrandLogo
@@ -206,40 +109,41 @@ const Checkout = () => {
           <div className="checkout-stepper">
             <div className="checkout-step checkout-step--active">
               <div className="checkout-step__circle">1</div>
-              <span className="checkout-step__label">Curated Selection</span>
+              <span className="checkout-step__label">{t('checkout.selectionStep')}</span>
             </div>
             <div className="checkout-step__line checkout-step__line--gold" />
             <div className="checkout-step checkout-step--active">
               <div className="checkout-step__circle">2</div>
-              <span className="checkout-step__label">Atelier Delivery</span>
+              <span className="checkout-step__label">{t('checkout.deliveryStep')}</span>
             </div>
             <div className="checkout-step__line" />
             <div className="checkout-step">
               <div className="checkout-step__circle">3</div>
-              <span className="checkout-step__label">Confirmation</span>
+              <span className="checkout-step__label">{t('checkout.confirmationStep')}</span>
             </div>
           </div>
 
           {/* Bag Items Section */}
           <section className="form-section">
             <div className="section-heading-wrap">
-              <h2>Your Selection</h2>
+              <h2>{t('checkout.yourSelection')}</h2>
               <span className="luxury-tag">
                 <Sparkles size={13} />
-                <span>Complimentary Insured Delivery</span>
+                <span>{t('checkout.insuredDelivery')}</span>
               </span>
             </div>
-            <p className="form-desc">Review your selected creations before confirming atelier fulfillment.</p>
+            <p className="form-desc">{t('checkout.guestText')}</p>
 
-            {error ? <p className="checkout-alert checkout-alert--error">{error}</p> : null}
+            {error ? <p role="alert" className="checkout-alert checkout-alert--error">{error}</p> : null}
+            {cartError ? <div role="alert" className="checkout-alert checkout-alert--error">{cartError} <button type="button" onClick={refreshCart}>{t('checkout.retryBag')}</button></div> : null}
 
             {loading ? (
-              <p className="checkout-status">Preparing your jewelry bag…</p>
+              <p className="checkout-status">{t('checkout.preparingBag')}</p>
             ) : isEmpty ? (
               <div className="checkout-empty">
-                <p>Your shopping bag is currently empty.</p>
+                <p>{t('checkout.empty')}</p>
                 <Link to="/collections/necklaces" className="checkout-empty__link">
-                  Explore Collections
+                  {t('checkout.explore')}
                 </Link>
               </div>
             ) : (
@@ -248,9 +152,9 @@ const Checkout = () => {
                   {cart.items.map((line, idx) => {
                     const p = line.product;
                     const categoryLabel = p?.categorySlug
-                      ? getCategoryLabel(p.categorySlug)
+                      ? getLocalizedCategoryLabel(p.categorySlug)
                       : p?.category ?? '';
-                    const disabled = busyId === line.productId;
+                    const disabled = checkoutBusy || busyId !== null;
 
                     return (
                       <Motion.li
@@ -269,14 +173,14 @@ const Checkout = () => {
                           )}
                         </div>
                         <div className="checkout-bag-item__body">
-                          <h4>{p?.name ?? 'Product'}</h4>
+                          <h4>{p?.name ?? t('checkout.product')}</h4>
                           {categoryLabel ? <p>{categoryLabel}</p> : null}
-                          <p className="checkout-bag-item__unit">{formatStorePrice(p?.price ?? 0)} each</p>
+                          <p className="checkout-bag-item__unit">{formatStorePrice(p?.price ?? 0, locale)} {t('checkout.each')}</p>
                           <div className="checkout-bag-item__actions">
                             <div className="qty-control">
                               <button
                                 type="button"
-                                aria-label="Decrease quantity"
+                                aria-label={t('checkout.decrease')}
                                 disabled={disabled || line.quantity <= 1}
                                 onClick={() => handleQtyChange(line.productId, line.quantity - 1)}
                               >
@@ -285,8 +189,8 @@ const Checkout = () => {
                               <span>{line.quantity}</span>
                               <button
                                 type="button"
-                                aria-label="Increase quantity"
-                                disabled={disabled}
+                                aria-label={t('checkout.increase')}
+                                disabled={disabled || line.quantity >= 100}
                                 onClick={() => handleQtyChange(line.productId, line.quantity + 1)}
                               >
                                 <Plus size={13} />
@@ -297,14 +201,14 @@ const Checkout = () => {
                               className="checkout-bag-item__remove"
                               disabled={disabled}
                               onClick={() => handleRemove(line.productId)}
-                              aria-label="Remove item"
+                              aria-label={t('checkout.removeItem')}
                             >
                               <Trash2 size={15} />
-                              <span className="remove-text">Remove</span>
+                              <span className="remove-text">{t('checkout.remove')}</span>
                             </button>
                           </div>
                         </div>
-                        <div className="checkout-bag-item__total">{formatStorePrice(line.lineTotal)}</div>
+                        <div className="checkout-bag-item__total">{formatStorePrice(line.lineTotal, locale)}</div>
                       </Motion.li>
                     );
                   })}
@@ -314,48 +218,52 @@ const Checkout = () => {
           </section>
 
           {/* Delivery & Shipping Information Section */}
-          {!isEmpty && (
+          {!isEmpty && !loading && !cartError && (
             <section className="form-section">
               <div className="section-heading-wrap">
-                <h2>Shipping & Delivery Address</h2>
+                <h2>{t('checkout.shippingAddress')}</h2>
                 <span className="luxury-tag">
                   <MapPin size={13} />
-                  <span>White-Glove Courier</span>
+                  <span>{t('checkout.whiteGlove')}</span>
                 </span>
               </div>
-              <p className="form-desc">Please enter your destination coordinates for high-security delivery.</p>
+              <p className="form-desc">{t('checkout.addressIntro')}</p>
 
               <form onSubmit={handlePlaceOrder} className="payment-form">
+                <fieldset disabled={checkoutBusy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
                 <div className="form-grid">
                   <div className="form-row">
-                    <label htmlFor="ship-fullname">Full Name *</label>
+                    <label htmlFor="ship-fullname">{t('checkout.fullName')}</label>
                     <input
                       id="ship-fullname"
+                      maxLength={200} autoComplete="name" minLength={2}
                       type="text"
                       required
-                      placeholder="e.g. Jane Doe"
+                      placeholder={t('checkout.fullNamePlaceholder')}
                       value={shippingForm.fullName}
                       onChange={(e) => handleInputChange('fullName', e.target.value)}
                     />
                   </div>
                   <div className="form-row">
-                    <label htmlFor="ship-email">Email Address *</label>
+                    <label htmlFor="ship-email">{t('checkout.email')}</label>
                     <input
                       id="ship-email"
+                      maxLength={254} autoComplete="email"
                       type="email"
                       required
-                      placeholder="e.g. jane@example.com"
+                      placeholder={t('checkout.emailPlaceholder')}
                       value={shippingForm.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                     />
                   </div>
                   <div className="form-row">
-                    <label htmlFor="ship-phone">Phone Number *</label>
+                    <label htmlFor="ship-phone">{t('checkout.phone')}</label>
                     <input
                       id="ship-phone"
+                      maxLength={30} autoComplete="tel"
                       type="tel"
                       required
-                      placeholder="e.g. +1 (555) 0199"
+                      placeholder={t('checkout.phonePlaceholder')}
                       value={shippingForm.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                     />
@@ -363,23 +271,25 @@ const Checkout = () => {
                 </div>
 
                 <div className="form-row">
-                  <label htmlFor="ship-addr1">Street Address *</label>
+                  <label htmlFor="ship-addr1">{t('checkout.street')}</label>
                   <input
                     id="ship-addr1"
+                      maxLength={255} autoComplete="address-line1"
                     type="text"
                     required
-                    placeholder="e.g. 742 Evergreen Terrace"
+                    placeholder={t('checkout.streetPlaceholder')}
                     value={shippingForm.addressLine1}
                     onChange={(e) => handleInputChange('addressLine1', e.target.value)}
                   />
                 </div>
 
                 <div className="form-row">
-                  <label htmlFor="ship-addr2">Apartment, Suite, Unit (Optional)</label>
+                  <label htmlFor="ship-addr2">{t('checkout.addressExtra')}</label>
                   <input
                     id="ship-addr2"
+                      maxLength={255} autoComplete="address-line2"
                     type="text"
-                    placeholder="e.g. Apt 4B, Penthouse Suite"
+                    placeholder={t('checkout.addressExtraPlaceholder')}
                     value={shippingForm.addressLine2}
                     onChange={(e) => handleInputChange('addressLine2', e.target.value)}
                   />
@@ -387,33 +297,36 @@ const Checkout = () => {
 
                 <div className="form-grid">
                   <div className="form-row">
-                    <label htmlFor="ship-city">City *</label>
+                    <label htmlFor="ship-city">{t('checkout.city')}</label>
                     <input
                       id="ship-city"
+                      maxLength={100} autoComplete="address-level2"
                       type="text"
                       required
-                      placeholder="e.g. Springfield"
+                      placeholder={t('checkout.cityPlaceholder')}
                       value={shippingForm.city}
                       onChange={(e) => handleInputChange('city', e.target.value)}
                     />
                   </div>
                   <div className="form-row">
-                    <label htmlFor="ship-state">State / Province</label>
+                    <label htmlFor="ship-state">{t('checkout.state')}</label>
                     <input
                       id="ship-state"
+                      maxLength={100} autoComplete="address-level1"
                       type="text"
-                      placeholder="e.g. OR / NY"
+                      placeholder={t('checkout.statePlaceholder')}
                       value={shippingForm.state}
                       onChange={(e) => handleInputChange('state', e.target.value)}
                     />
                   </div>
                   <div className="form-row">
-                    <label htmlFor="ship-zip">Postal / Zip Code *</label>
+                    <label htmlFor="ship-zip">{t('checkout.postalCode')}</label>
                     <input
                       id="ship-zip"
+                      maxLength={30} autoComplete="postal-code"
                       type="text"
                       required
-                      placeholder="e.g. 97477"
+                      placeholder={t('checkout.postalCodePlaceholder')}
                       value={shippingForm.postalCode}
                       onChange={(e) => handleInputChange('postalCode', e.target.value)}
                     />
@@ -421,11 +334,17 @@ const Checkout = () => {
                 </div>
 
                 <div className="form-row">
-                  <label htmlFor="ship-notes">Bespoke Instructions / Gift Box Notes</label>
+                  <label htmlFor="ship-country">{t('checkout.country')}</label>
+                  <input id="ship-country" autoComplete="country-name" required maxLength={100}
+                    value={shippingForm.country} onChange={(event) => handleInputChange('country', event.target.value)} />
+                </div>
+                <div className="form-row">
+                  <label htmlFor="ship-notes">{t('checkout.notes')}</label>
                   <input
                     id="ship-notes"
+                      maxLength={1000} autoComplete="off"
                     type="text"
-                    placeholder="e.g. Please package in velvet luxury gift box with custom wax seal."
+                    placeholder={t('checkout.notesPlaceholder')}
                     value={shippingForm.notes}
                     onChange={(e) => handleInputChange('notes', e.target.value)}
                   />
@@ -434,16 +353,16 @@ const Checkout = () => {
                 <button
                   type="submit"
                   className="pay-now-btn"
-                  disabled={checkoutBusy || loading}
+                  disabled={checkoutBusy || loading || busyId !== null}
                 >
                   {checkoutBusy ? (
                     <span className="btn-loading-state">
                       <span className="cta-gold-spinner" />
-                      <span>Placing Your Order…</span>
+                      <span>{t('checkout.placing')}</span>
                     </span>
                   ) : (
                     <span className="btn-ready-state">
-                      <span>Confirm & Place Order — {formatStorePrice(cart.subtotal)}</span>
+                      <span>{t('checkout.placeContinue')}</span>
                       <span className="pay-btn-gleam" />
                     </span>
                   )}
@@ -451,8 +370,9 @@ const Checkout = () => {
 
                 <div className="checkout-security-badge">
                   <ShieldCheck size={16} />
-                  <span>Encrypted Order Fulfillment with Automated Concierge Notification</span>
+                  <span>{t('checkout.security')}</span>
                 </div>
+                </fieldset>
               </form>
             </section>
           )}
@@ -461,7 +381,7 @@ const Checkout = () => {
         {/* Order Summary Sidebar */}
         <aside className="checkout-sidebar">
           <div className="summary-card">
-            <h3>Order Summary</h3>
+            <h3>{t('checkout.summary')}</h3>
 
             <div className="summary-items">
               {cart.items.map((line) => {
@@ -475,10 +395,10 @@ const Checkout = () => {
                       <span className="item-qty">{line.quantity}</span>
                     </div>
                     <div className="item-info">
-                      <h4>{p?.name ?? 'Product'}</h4>
-                      <p>{p?.categorySlug ? getCategoryLabel(p.categorySlug) : ''}</p>
+                      <h4>{p?.name ?? t('checkout.product')}</h4>
+                      <p>{p?.categorySlug ? getLocalizedCategoryLabel(p.categorySlug) : ''}</p>
                     </div>
-                    <div className="item-price">{formatStorePrice(line.lineTotal)}</div>
+                    <div className="item-price">{formatStorePrice(line.lineTotal, locale)}</div>
                   </div>
                 );
               })}
@@ -486,16 +406,16 @@ const Checkout = () => {
 
             <div className="summary-totals">
               <div className="total-row">
-                <span>Subtotal ({cart.itemCount} items)</span>
-                <span>{formatStorePrice(cart.subtotal)}</span>
+                <span>{t('checkout.subtotalItems', { count: cart.itemCount })}</span>
+                <span>{formatStorePrice(cart.subtotal, locale)}</span>
               </div>
               <div className="total-row">
-                <span>Insured Luxury Delivery</span>
-                <span style={{ color: '#10b981', fontWeight: 600 }}>Complimentary</span>
+                <span>{t('checkout.shippingTaxes')}</span>
+                <span>{t('checkout.calculatedPayment')}</span>
               </div>
               <div className="total-row grand-total">
-                <span>Total</span>
-                <span>{formatStorePrice(cart.subtotal)}</span>
+                <span>{t('checkout.itemsSubtotal')}</span>
+                <span>{formatStorePrice(cart.subtotal, locale)}</span>
               </div>
             </div>
           </div>
