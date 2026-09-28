@@ -117,6 +117,14 @@
   box-shadow: none;
 }
 
+.product-card__badge--sale {
+  left: auto;
+  right: 0.65rem;
+  background: #9f1239;
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(159, 18, 57, 0.3);
+}
+
 .quick-add-container {
   position: absolute;
   bottom: 0;
@@ -188,4 +196,24 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   font-family: var(--font-sans);
+}
+
+.product-price-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.product-price--original {
+  color: #858585;
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.product-price--sale {
+  color: #9f1239;
+  font-weight: 800;
 }

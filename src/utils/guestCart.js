@@ -1,6 +1,8 @@
+import { getCurrentProductPrice } from './productPricing.js';
+
 const CART_KEY = 'husan_guest_cart';
 export function buildGuestCart(items) {
-  const lines = items.map((item) => ({ ...item, lineTotal: Math.round(Number(item.product?.price || 0) * item.quantity * 100) / 100 }));
+  const lines = items.map((item) => ({ ...item, lineTotal: Math.round(getCurrentProductPrice(item.product) * item.quantity * 100) / 100 }));
   return { items: lines, itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
     subtotal: Math.round(lines.reduce((sum, line) => sum + line.lineTotal, 0) * 100) / 100 };
 }

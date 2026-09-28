@@ -19,6 +19,7 @@ export function productsBasePath(categorySlug) {
  *   name?: string,
  *   description?: string,
  *   price?: number,
+ *   discountPercent?: number,
  *   quantity?: number,
  *   isAvailable?: boolean,
  *   image?: File,
@@ -29,11 +30,12 @@ export function productsBasePath(categorySlug) {
  */
 export function buildProductFormData(fields) {
   const form = new FormData();
-  const { name, description, price, quantity, isAvailable, image, images, existingImages } = fields;
+  const { name, description, price, discountPercent, quantity, isAvailable, image, images, existingImages } = fields;
 
   if (name !== undefined) form.append('name', name);
   if (description !== undefined) form.append('description', description);
   if (price !== undefined) form.append('price', String(price));
+  if (discountPercent !== undefined) form.append('discountPercent', String(discountPercent));
   if (quantity !== undefined) form.append('quantity', String(Math.max(0, Math.floor(Number(quantity)))));
   if (isAvailable !== undefined) {
     form.append('isAvailable', isAvailable ? 'true' : 'false');

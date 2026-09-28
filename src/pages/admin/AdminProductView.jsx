@@ -100,7 +100,12 @@ const AdminProductView = () => {
         <dt>Category</dt>
         <dd>{product.category}</dd>
         <dt>Price</dt>
-        <dd>{formatMoney(product.price)}</dd>
+        <dd>
+          {product.onSale ? <><del>{formatMoney(product.originalPrice)}</del>{' '}</> : null}
+          {formatMoney(product.onSale ? product.salePrice : product.price)}
+        </dd>
+        <dt>Sale discount</dt>
+        <dd>{product.discountPercent || 0}%</dd>
         <dt>Quantity</dt>
         <dd>{product.quantity}</dd>
         <dt>Listed</dt>

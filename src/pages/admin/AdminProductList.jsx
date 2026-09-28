@@ -146,7 +146,11 @@ const AdminProductList = () => {
                       </div>
                     </td>
                     <td className="admin-product-list__name">{p.name}</td>
-                    <td>{formatMoney(p.price)}</td>
+                    <td>
+                      {p.onSale ? <><del>{formatMoney(p.originalPrice)}</del><br /></> : null}
+                      {formatMoney(p.onSale ? p.salePrice : p.price)}
+                      {p.onSale ? ` (-${p.discountPercent}%)` : ''}
+                    </td>
                     <td>{p.quantity}</td>
                     <td>
                       <span

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion as Motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContextValue';
+import { getCurrentProductPrice } from '../utils/productHelpers';
 import './ProductCard.css';
 
 
@@ -59,6 +60,11 @@ const ProductCard = ({ product, categorySlug }) => {
           ) : product.quantity <= 3 ? (
             <span className="product-card__badge">{t('product.onlyLeft', { count: product.quantity })}</span>
           ) : null}
+          {product.onSale ? (
+            <span className="product-card__badge product-card__badge--sale">
+              {t('product.saleBadge', { percent: product.discountPercent })}
+            </span>
+          ) : null}
           <div className="quick-add-container">
             <span className="quick-add-btn">
               <span>{t('product.viewDetails')}</span>
@@ -68,7 +74,16 @@ const ProductCard = ({ product, categorySlug }) => {
         </div>
         <div className="product-info">
           <h3 className="product-name">{product.name}</h3>
-          <p className="product-price">{formatMoney(product.price, locale)}</p>
+          <div className="product-price-group">
+            {product.onSale ? (
+              <span className="product-price product-price--original">
+                {formatMoney(product.originalPrice, locale)}
+              </span>
+            ) : null}
+            <span className={`product-price ${product.onSale ? 'product-price--sale' : ''}`}>
+              {formatMoney(getCurrentProductPrice(product), locale)}
+            </span>
+          </div>
         </div>
       </Link>
     </Motion.article>

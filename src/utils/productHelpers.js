@@ -1,5 +1,6 @@
 import { API_ORIGIN } from '../api/config';
 import { CATEGORY_DB_TO_SLUG } from '../constants/productCategories';
+export { getCurrentProductPrice } from './productPricing.js';
 
 /**
  * Extract /uploads/... path from a full or relative URL.
@@ -83,6 +84,11 @@ export function normalizeProduct(p) {
   const imageUrl = images[0] || resolveImageUrl(pickRawImageUrl(p));
   const category = p.category ?? '';
   const categorySlug = CATEGORY_DB_TO_SLUG[category] ?? p.categorySlug ?? category;
+  const originalPrice = Number(p.originalPrice ?? p.price) || 0;
+  const discountPercent = Number(p.discountPercent ?? p.discount_percent) || 0;
+  const onSale = Boolean(p.onSale ?? p.on_sale ?? discountPercent > 0);
+  const calculatedSalePrice = Math.round(originalPrice * (1 - discountPercent / 100) * 100) / 100;
+  const salePrice = Number(p.salePrice ?? p.sale_price ?? (onSale ? calculatedSalePrice : originalPrice));
 
   return {
     id: p.id,
@@ -90,7 +96,11 @@ export function normalizeProduct(p) {
     categorySlug,
     name: p.name ?? '',
     description: p.description ?? '',
-    price: Number(p.price) || 0,
+    price: originalPrice,
+    originalPrice,
+    salePrice: Number.isFinite(salePrice) ? salePrice : originalPrice,
+    discountPercent,
+    onSale,
     imageUrl,
     image: imageUrl,
     images,

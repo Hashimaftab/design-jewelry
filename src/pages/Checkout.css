@@ -510,6 +510,11 @@
   font-weight: 500;
 }
 
+.checkout-bag-item__unit del {
+  color: #8a8a8a;
+  margin-right: 0.25rem;
+}
+
 .checkout-bag-item__actions {
   display: flex;
   align-items: center;

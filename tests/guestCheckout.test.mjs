@@ -53,6 +53,8 @@ test('guest bag survives reload with estimated totals and handles corrupt storag
   assert.equal(readGuestCart().subtotal, 50);
   assert.equal(readGuestCart().itemCount, 2);
   assert.equal(readGuestCart().items[0].productId, productId);
+  writeGuestCart([{ productId, quantity: 2, product: { price: 100, salePrice: 50, onSale: true } }]);
+  assert.equal(readGuestCart().subtotal, 100);
   localStorage.setItem('husan_guest_cart', '[null, {"quantity": -1}]');
   assert.equal(readGuestCart().items.length, 0);
   localStorage.setItem('husan_guest_cart', 'broken json');

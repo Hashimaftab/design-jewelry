@@ -8,6 +8,7 @@ import { isValidCategory } from '../constants/productCategories';
 import { useCart } from '../context/CartContextValue';
 import { getApiErrorMessage } from '../utils/adminAuth';
 import { useLanguage } from '../context/LanguageContextValue';
+import { getCurrentProductPrice } from '../utils/productHelpers';
 
 
 const ProductDetail = () => {
@@ -151,7 +152,21 @@ const ProductDetail = () => {
           <div className="product-detail__info">
             <p className="product-detail__category">{label}</p>
             <h1 className="product-detail__title">{product.name}</h1>
-            <p className="product-detail__price">{formatMoney(product.price, locale)}</p>
+            {product.onSale ? (
+              <span className="product-detail__sale-badge">
+                {t('product.saleBadge', { percent: product.discountPercent })}
+              </span>
+            ) : null}
+            <div className="product-detail__pricing">
+              {product.onSale ? (
+                <span className="product-detail__price product-detail__price--original">
+                  {formatMoney(product.originalPrice, locale)}
+                </span>
+              ) : null}
+              <span className={`product-detail__price ${product.onSale ? 'product-detail__price--sale' : ''}`}>
+                {formatMoney(getCurrentProductPrice(product), locale)}
+              </span>
+            </div>
 
             <div
               className={`product-detail__stock ${

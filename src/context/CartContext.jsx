@@ -13,6 +13,7 @@ import { getApiErrorMessage } from '../utils/adminAuth';
 import { CartContext } from './CartContextValue';
 import { readGuestCart, writeGuestCart } from '../utils/guestCart';
 import { useLanguage } from './LanguageContextValue';
+import { getCurrentProductPrice } from '../utils/productHelpers';
 
 const emptyCart = { items: [], itemCount: 0, subtotal: 0 };
 
@@ -91,7 +92,7 @@ export const CartProvider = ({ children }) => {
       const toastPayload = {
         name: productDetails?.name || foundItem?.product?.name || t('cart.jewelryPiece'),
         imageUrl: productDetails?.imageUrl || productDetails?.image || foundItem?.product?.imageUrl,
-        price: productDetails?.price || foundItem?.product?.price,
+        price: getCurrentProductPrice(productDetails || foundItem?.product),
         quantity,
       };
       setCartToast(toastPayload);

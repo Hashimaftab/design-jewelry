@@ -77,9 +77,41 @@
 .product-detail__price {
   font-size: 1.75rem;
   letter-spacing: 0.04em;
-  margin-bottom: 1.75rem;
   color: var(--gold-primary);
   font-weight: 600;
+}
+
+.product-detail__pricing {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.product-detail__price--original {
+  color: #777;
+  font-size: 1.15rem;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+.product-detail__price--sale {
+  color: #9f1239;
+  font-weight: 800;
+}
+
+.product-detail__sale-badge {
+  display: inline-flex;
+  margin-bottom: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #9f1239;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .product-detail__stock {

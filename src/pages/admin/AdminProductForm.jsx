@@ -24,6 +24,7 @@ const AdminProductForm = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [discountPercent, setDiscountPercent] = useState('0');
   const [quantity, setQuantity] = useState('0');
   const [isAvailable, setIsAvailable] = useState(true);
   const [images, setImages] = useState([]); // Array of { id, url, file, isServer }
@@ -49,6 +50,7 @@ const AdminProductForm = () => {
       setName('');
       setDescription('');
       setPrice('');
+      setDiscountPercent('0');
       setQuantity('0');
       setIsAvailable(true);
       setImages([]);
@@ -74,6 +76,7 @@ const AdminProductForm = () => {
         setName(p.name);
         setDescription(p.description);
         setPrice(String(p.price));
+        setDiscountPercent(String(p.discountPercent ?? 0));
         setQuantity(String(p.quantity));
         setIsAvailable(p.isAvailable);
 
@@ -174,10 +177,15 @@ const AdminProductForm = () => {
     setError('');
 
     const priceNum = parseFloat(price);
+    const discountNum = parseFloat(discountPercent || '0');
     const qtyNum = parseInt(quantity, 10);
 
     if (Number.isNaN(priceNum) || priceNum <= 0) {
       setError('Enter a valid price greater than 0.');
+      return;
+    }
+    if (Number.isNaN(discountNum) || discountNum < 0 || discountNum > 99) {
+      setError('Sale discount must be between 0% and 99%.');
       return;
     }
     if (!name.trim()) {
@@ -210,6 +218,7 @@ const AdminProductForm = () => {
         name: name.trim(),
         description: description.trim(),
         price: priceNum,
+        discountPercent: discountNum,
         quantity: qtyNum,
         isAvailable,
         images: newFiles,
@@ -339,6 +348,19 @@ const AdminProductForm = () => {
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
+            />
+          </div>
+          <div className="admin-product-form__field">
+            <label htmlFor="p-discount">Sale discount (%)</label>
+            <input
+              id="p-discount"
+              type="number"
+              min="0"
+              max="99"
+              step="0.01"
+              className="admin-product-form__input"
+              value={discountPercent}
+              onChange={(e) => setDiscountPercent(e.target.value)}
             />
           </div>
         </div>

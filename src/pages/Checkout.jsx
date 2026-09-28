@@ -175,7 +175,10 @@ const Checkout = () => {
                         <div className="checkout-bag-item__body">
                           <h4>{p?.name ?? t('checkout.product')}</h4>
                           {categoryLabel ? <p>{categoryLabel}</p> : null}
-                          <p className="checkout-bag-item__unit">{formatStorePrice(p?.price ?? 0, locale)} {t('checkout.each')}</p>
+                          <p className="checkout-bag-item__unit">
+                            {p?.onSale ? <del>{formatStorePrice(p.originalPrice, locale)}</del> : null}{' '}
+                            {formatStorePrice(p?.salePrice ?? p?.price ?? 0, locale)} {t('checkout.each')}
+                          </p>
                           <div className="checkout-bag-item__actions">
                             <div className="qty-control">
                               <button
