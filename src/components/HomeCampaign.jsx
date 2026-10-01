@@ -1,11 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion as Motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { Pause, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContextValue';
 
-export default function HomeCampaign({ image, imagePosition = 'center', eyebrow, title, href, cta, hero = false }) {
+export default function HomeCampaign({ image, video, videoMobile, imagePosition = 'center', eyebrow, title, href, cta, hero = false }) {
   const sectionRef = useRef(null);
+  const videoRef = useRef(null);
+  const videoMobileRef = useRef(null);
   const reducedMotion = useReducedMotion();
   const inView = useInView(sectionRef, { amount: 0.1 });
   const [paused, setPaused] = useState(false);
@@ -14,17 +16,53 @@ export default function HomeCampaign({ image, imagePosition = 'center', eyebrow,
   const Heading = hero ? 'h1' : 'h2';
   const { t } = useLanguage();
 
+  useEffect(() => {
+    [videoRef, videoMobileRef].forEach((ref) => {
+      if (!ref.current) return;
+      if (paused || reducedMotion) {
+        ref.current.pause();
+      } else {
+        ref.current.play().catch(() => {});
+      }
+    });
+  }, [paused, reducedMotion]);
+
   return (
     <section ref={sectionRef} className={`home-campaign${hero ? ' home-campaign--hero' : ''}`}>
-      <Motion.div className="home-campaign__media" style={{ y: reducedMotion ? 0 : y }}>
-        <img
-          src={image}
-          alt=""
-          loading={hero ? 'eager' : 'lazy'}
-          fetchPriority={hero ? 'high' : 'auto'}
-          style={{ objectPosition: imagePosition, animationPlayState: inView && !paused && !reducedMotion ? 'running' : 'paused' }}
-        />
-      </Motion.div>
+      {video ? (
+        <>
+          <video
+            ref={videoRef}
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="home-campaign__video-bg home-campaign__video-bg--desktop"
+          />
+          {videoMobile && (
+            <video
+              ref={videoMobileRef}
+              src={videoMobile}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="home-campaign__video-bg home-campaign__video-bg--mobile"
+            />
+          )}
+        </>
+      ) : (
+        <Motion.div className="home-campaign__media" style={{ y: reducedMotion ? 0 : y }}>
+          <img
+            src={image}
+            alt=""
+            loading={hero ? 'eager' : 'lazy'}
+            fetchPriority={hero ? 'high' : 'auto'}
+            style={{ objectPosition: imagePosition, animationPlayState: inView && !paused && !reducedMotion ? 'running' : 'paused' }}
+          />
+        </Motion.div>
+      )}
       <div className="home-campaign__shade" />
       <Motion.div
         className="home-campaign__copy"

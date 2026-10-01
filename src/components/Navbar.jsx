@@ -103,6 +103,7 @@ const Navbar = () => {
             <Link to="/collections/rings" className="nav-cat-link">{t('category.rings')}</Link>
             <Link to="/collections/bracelets" className="nav-cat-link">{t('category.bracelets')}</Link>
             <Link to="/collections/gifts" className="nav-cat-link">{t('category.gifts')}</Link>
+            <Link to="/new-arrivals" className="nav-cat-link">{t('catalog.newArrivals')}</Link>
           </div>
         </div>
 
@@ -125,6 +126,7 @@ const Navbar = () => {
             <Link to="/collections/rings" className="mobile-nav-link" onClick={() => setMenuPath(null)}>{t('category.rings')}</Link>
             <Link to="/collections/bracelets" className="mobile-nav-link" onClick={() => setMenuPath(null)}>{t('category.bracelets')}</Link>
             <Link to="/collections/gifts" className="mobile-nav-link" onClick={() => setMenuPath(null)}>{t('category.gifts')}</Link>
+            <Link to="/new-arrivals" className="mobile-nav-link" onClick={() => setMenuPath(null)}>{t('catalog.newArrivals')}</Link>
           </div>
           <div className="mobile-user-actions">
             {token ? (

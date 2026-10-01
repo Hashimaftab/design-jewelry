@@ -55,8 +55,9 @@ const Home = () => {
     <div className="home-page home-campaigns">
       <HomeCampaign
         hero
-        image="/ChatGPT Image Sep 7, 2026, 06_37_21 AM.png"
-        imagePosition="center 35%"
+        video="/gemini_generated_video_f8b0a999.mp4"
+        videoMobile="/gemini_generated_video_0d780065.mp4"
+        imagePosition="60% 45%"
         eyebrow={t('home.heroEyebrow')}
         title={t('home.heroTitle')}
         href="/collections/necklaces"
@@ -67,7 +68,7 @@ const Home = () => {
         <Motion.div className="home-editorial__image"
           initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
           viewport={{ once: true, amount: 0.15 }} transition={{ duration: 0.8 }}>
-          <img src="/shop_look.png" alt={t('home.editorialAlt')} loading="lazy" />
+          <img src="/WhatsApp Image 2026-09-29 at 11.36.18 PM.jpeg" alt={t('home.editorialAlt')} loading="lazy" />
         </Motion.div>
         <Motion.div className="home-editorial__copy"
           initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
@@ -79,23 +80,16 @@ const Home = () => {
         </Motion.div>
       </section>
 
-      <HomeCampaign
-        image="/gift_love.png"
-        imagePosition="center 48%"
-        eyebrow={t('home.giftEyebrow')}
-        title={t('home.giftTitle')}
-        href="/collections/gifts"
-        cta={t('home.shopGifts')}
-      />
-      {/* Each collection uses the same full-width animated campaign layout. */}
-      {[
-        { image: '/cat_gifts.png', title: t('home.giftsForHer'), eyebrow: t('home.curatedExpressions'), href: '/collections/gifts', cta: t('home.shopGiftsForHer') },
-        { image: '/cat_earrings.png', title: t('category.earrings'), eyebrow: t('home.solitairesDrops'), href: '/collections/earrings', cta: t('home.shopEarrings'), imagePosition: 'center 40%' },
-        { image: '/cat_bracelets.png', title: t('category.bracelets'), eyebrow: t('home.tennisBangles'), href: '/collections/bracelets', cta: t('home.shopBracelets') },
-        { image: '/cat_newin.png', title: t('home.newInRings'), eyebrow: t('home.latestCreations'), href: '/collections/rings', cta: t('home.shopRings') },
-      ].map((collection) => (
-        <HomeCampaign key={collection.href} {...collection} />
-      ))}
+      <section className="home-editorial-video">
+        <video
+          src="/gemini_generated_video_320ff75b.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="home-editorial-video__player"
+        />
+      </section>
 
       {/* Redesigned Featured Pieces Section */}
       <section className="trending-section container">
@@ -125,15 +119,6 @@ const Home = () => {
           <p className="home-featured-loading" role={featuredError ? 'alert' : undefined}>{featuredError || t('home.noProducts')}</p>
         )}
       </section>
-
-      <HomeCampaign
-        image="/earrings.png"
-        imagePosition="center 45%"
-        eyebrow={t('home.newArrivalsEyebrow')}
-        title={t('home.newArrivalsTitle')}
-        href="/new-arrivals"
-        cta={t('home.shopNewArrivals')}
-      />
 
       {/* Redesigned Frosted Luxury Newsletter */}
       <section

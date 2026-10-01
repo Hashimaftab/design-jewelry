@@ -24,28 +24,19 @@ const Footer = () => {
             </ul>
           </div>
           <div className="footer-col">
-            <h3>{t('footer.about')}</h3>
-            <ul>
-              <li><a href="#">{t('footer.story')}</a></li>
-              <li><a href="#">{t('footer.sustainability')}</a></li>
-              <li><a href="#">{t('footer.journal')}</a></li>
-            </ul>
-          </div>
-          <div className="footer-col">
             <h3>{t('footer.support')}</h3>
             <ul>
               <li><a href="#">{t('footer.contact')}</a></li>
-              <li><a href="#">{t('footer.shippingReturns')}</a></li>
-              <li><a href="#">{t('footer.careGuide')}</a></li>
+              <li><Link to="/shipping-policy">{t('footer.shippingPolicy')}</Link></li>
+              <li><Link to="/return-policy">{t('footer.returnPolicy')}</Link></li>
+              <li><Link to="/terms-of-service">{t('footer.termsOfService')}</Link></li>
             </ul>
           </div>
           <div className="footer-col">
             <h3>{t('footer.legal')}</h3>
             <ul>
               <li><Link to="/privacy-policy">{t('footer.privacyPolicy')}</Link></li>
-              <li><Link to="/shipping-policy">{t('footer.shippingPolicy')}</Link></li>
-              <li><Link to="/return-policy">{t('footer.returnPolicy')}</Link></li>
-              <li><Link to="/terms-of-service">{t('footer.termsOfService')}</Link></li>
+              <li><Link to="/legal-notice">{t('footer.legalNotice')}</Link></li>
             </ul>
           </div>
         </div>

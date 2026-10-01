@@ -69,6 +69,7 @@ function App() {
           <Route path="/shipping-policy" element={<LegalPage policy="shipping" />} />
           <Route path="/return-policy" element={<LegalPage policy="returns" />} />
           <Route path="/terms-of-service" element={<LegalPage policy="terms" />} />
+          <Route path="/legal-notice" element={<LegalPage policy="legalNotice" />} />
 
           {/* Auth Layout (Public Routes for unauthenticated users) */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

@@ -24,7 +24,6 @@ export default function LegalPage({ policy }) {
         <div className="container legal-hero__inner">
           <p className="legal-hero__eyebrow">{content.eyebrow}</p>
           <h1>{content.title}</h1>
-          <p>{t('legal.husnCompany')}</p>
         </div>
       </header>
 
@@ -53,7 +52,7 @@ export default function LegalPage({ policy }) {
               <address className="legal-contact">
                 <strong>HUSN BV</strong>
                 <span>{t('legal.website')}: <a href="https://www.husnx.com">husnx.com</a></span>
-                <span>{t('legal.email')}: <a href="mailto:hello@husnx.com">hello@husnx.com</a></span>
+                <span>{t('legal.email')}: <a href="mailto:husnjewelryx@gmail.com">husnjewelryx@gmail.com</a></span>
               </address>
             ) : null}
           </section>

@@ -171,6 +171,48 @@ export const legalPolicies = {
         },
       ],
     },
+    legalNotice: {
+      eyebrow: 'Wettelijke informatie',
+      title: 'Wettelijke mededeling',
+      introTitle: 'Bedrijfsinformatie',
+      intro: [
+        'Overeenkomstig de wettelijke vereisten verstrekken wij hierbij de volgende informatie over HUSN.',
+      ],
+      sections: [
+        {
+          title: 'Bedrijfsgegevens',
+          bullets: [
+            { label: 'Bedrijfsnaam', text: 'HUSN BV' },
+            { label: 'Geregistreerd in', text: 'Nederland' },
+            { label: 'KvK-nummer', text: '42038669' },
+            { label: 'Btw-nummer', text: 'NL005447738B51' },
+          ],
+        },
+        {
+          title: 'Contactgegevens',
+          contact: true,
+        },
+        {
+          title: 'Intellectueel eigendom',
+          paragraphs: [
+            'Alle inhoud op deze website — inclusief teksten, afbeeldingen, video\'s, logo\'s en grafisch ontwerp — is eigendom van HUSN BV of is in licentie gegeven aan HUSN BV. Niets van deze website mag worden gekopieerd, verspreid of voor commerciële doeleinden worden gebruikt zonder voorafgaande schriftelijke toestemming van HUSN BV.',
+          ],
+        },
+        {
+          title: 'Aansprakelijkheidsbeperking',
+          paragraphs: [
+            'HUSN BV besteedt de grootst mogelijke zorg aan de inhoud van deze website. Wij kunnen echter niet garanderen dat alle informatie volledig, actueel of foutloos is. HUSN BV aanvaardt geen aansprakelijkheid voor schade die voortvloeit uit het gebruik van de informatie op deze website.',
+            'Verwijzingen naar websites van derden worden uitsluitend ter informatie aangeboden. HUSN BV is niet verantwoordelijk voor de inhoud van externe websites.',
+          ],
+        },
+        {
+          title: 'Toepasselijk recht',
+          paragraphs: [
+            'Op deze wettelijke mededeling en het gebruik van deze website is het Nederlands recht van toepassing. Eventuele geschillen worden voorgelegd aan de bevoegde rechter in Nederland.',
+          ],
+        },
+      ],
+    },
   },
   en: {
     privacy: {
@@ -340,6 +382,48 @@ export const legalPolicies = {
           title: 'Limitation of Liability',
           paragraphs: [
             'HUSN shall not be held liable for any direct or indirect damages resulting from the use of this website. Our liability is limited to the amount paid for the product purchased.',
+          ],
+        },
+      ],
+    },
+    legalNotice: {
+      eyebrow: 'Legal information',
+      title: 'Legal Notice',
+      introTitle: 'Company Information',
+      intro: [
+        'In accordance with applicable legal requirements, we provide the following information about HUSN.',
+      ],
+      sections: [
+        {
+          title: 'Company Details',
+          bullets: [
+            { label: 'Company name', text: 'HUSN BV' },
+            { label: 'Registered in', text: 'The Netherlands' },
+            { label: 'Chamber of Commerce (KvK)', text: '42038669' },
+            { label: 'VAT (Btw) number', text: 'NL005447738B51' },
+          ],
+        },
+        {
+          title: 'Contact Information',
+          contact: true,
+        },
+        {
+          title: 'Intellectual Property',
+          paragraphs: [
+            'All content on this website — including text, images, videos, logos, and graphic design — is the property of HUSN BV or is licensed to HUSN BV. Nothing on this website may be copied, distributed, or used for commercial purposes without prior written permission from HUSN BV.',
+          ],
+        },
+        {
+          title: 'Limitation of Liability',
+          paragraphs: [
+            'HUSN BV takes the greatest possible care with the content of this website. However, we cannot guarantee that all information is complete, current, or error-free. HUSN BV accepts no liability for any damages arising from the use of information on this website.',
+            'Links to third-party websites are provided for informational purposes only. HUSN BV is not responsible for the content of external websites.',
+          ],
+        },
+        {
+          title: 'Governing Law',
+          paragraphs: [
+            'This legal notice and the use of this website are governed by the laws of the Netherlands. Any disputes shall be submitted to the competent court in the Netherlands.',
           ],
         },
       ],

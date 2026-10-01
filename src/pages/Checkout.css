@@ -733,3 +733,123 @@
     flex-wrap: wrap;
   }
 }
+
+/* ── Order Confirmation Detail Layout ── */
+.order-confirm {
+  margin-top: 2rem;
+  width: 100%;
+  text-align: left;
+}
+
+.order-confirm__ref {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.5rem;
+  background: #faf8f5;
+  border: 1px solid var(--border-gold);
+  margin-bottom: 0.5rem;
+}
+
+.order-confirm__ref span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-secondary);
+}
+
+.order-confirm__ref strong {
+  font-size: 1rem;
+  color: var(--gold-primary);
+  letter-spacing: 0.06em;
+}
+
+.order-confirm__section {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-gold);
+}
+
+.order-confirm__section h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  margin: 0 0 1rem;
+}
+
+.order-confirm__items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.order-confirm__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.order-confirm__item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.order-confirm__item-name {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.order-confirm__item-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.order-confirm__item-total {
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.order-confirm__totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.order-confirm__total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.order-confirm__total-row--grand {
+  padding-top: 0.65rem;
+  margin-top: 0.2rem;
+  border-top: 1px solid var(--border-gold);
+  font-size: 1rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.order-confirm__total-row--grand strong {
+  color: var(--gold-primary);
+  font-size: 1.05rem;
+}
+
+.order-confirm__address {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-style: normal;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.75;
+}

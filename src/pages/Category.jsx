@@ -9,11 +9,11 @@ import { useLanguage } from '../context/LanguageContextValue';
 const PAGE_SIZE = 12;
 
 const CATEGORY_META = {
-  necklaces: { titleKey: 'category.necklacesTitle', bg: '/hero_bg.png' },
-  earrings: { titleKey: 'category.earringsTitle', bg: '/cat_earrings.png' },
-  rings: { titleKey: 'category.ringsTitle', bg: '/gift_love.png' },
-  bracelets: { titleKey: 'category.braceletsTitle', bg: '/cat_bracelets.png' },
-  gifts: { titleKey: 'category.giftsTitle', bg: '/cat_gifts.png' },
+  necklaces: { titleKey: 'category.necklacesTitle', video: '/gemini_generated_video_5028b0fc.mp4' },
+  earrings: { titleKey: 'category.earringsTitle', video: '/gemini_generated_video_1d5bf7e3.mp4' },
+  rings: { titleKey: 'category.ringsTitle', video: '/gemini_generated_video_1c4ccc39.mp4' },
+  bracelets: { titleKey: 'category.braceletsTitle', video: '/gemini_generated_video_eb1eec95.mp4' },
+  gifts: { titleKey: 'category.giftsTitle', video: '/gemini_generated_video_5529b9fe.mp4' },
 };
 
 const CategoryCollection = ({ category, search }) => {
@@ -64,7 +64,17 @@ const CategoryCollection = ({ category, search }) => {
 
   return (
     <div className="category-page">
-      <div className="category-header" style={{ backgroundImage: `url(${meta.bg})` }}>
+      <div className="category-header" style={meta.bg ? { backgroundImage: `url(${meta.bg})` } : undefined}>
+        {meta.video && (
+          <video
+            src={meta.video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="category-header__video"
+          />
+        )}
         <h1 className="category-title">{t(meta.titleKey)}</h1>
         <p className="category-desc">{t('category.description', { category: label.toLowerCase() })}</p>
       </div>
