@@ -225,7 +225,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 3rem;
+  gap: 1.75rem;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .nav-cat-link {
@@ -239,6 +241,7 @@
   position: relative;
   padding-bottom: 4px;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .nav-cat-link::after {
@@ -285,7 +288,7 @@
 /* Responsive Media Queries */
 @media (max-width: 900px) {
   .nav-categories {
-    gap: 1.75rem;
+    gap: 1rem;
   }
 }
 
