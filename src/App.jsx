@@ -1,5 +1,11 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [pathname]);
+  return null;
+}
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -48,6 +54,7 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <a className="skip-link" href="#main-content">{storefrontText('app.skipToContent', 'Skip to content')}</a>
       {!isAdmin && <CartToast />}
       {!hideNavbarFooter && <Navbar />}
