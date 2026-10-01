@@ -22,9 +22,6 @@
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
 }
 
-.on-other .nav-search-bar {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-}
 
 .on-other .nav-search-icon {
   color: #4b5563;
@@ -98,8 +95,6 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
-  padding-bottom: 0.4rem;
   width: 100%;
   max-width: 340px;
   flex: 1.4;
@@ -108,8 +103,14 @@
 }
 
 .nav-search-bar:focus-within {
-  border-bottom-color: var(--gold-primary);
-  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
+  outline: none;
+  box-shadow: none;
+}
+
+.nav-search-input:focus,
+.nav-search-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .nav-search-icon {

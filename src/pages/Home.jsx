@@ -132,11 +132,6 @@ const Home = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <div className="newsletter-badge">
-            <Sparkles size={14} className="newsletter-badge-icon" />
-            <span>{t('home.clubBadge')}</span>
-          </div>
-
           <h2 className="newsletter-title">{t('home.societyTitle')}</h2>
           <p className="newsletter-desc">
             {t('home.societyText')}

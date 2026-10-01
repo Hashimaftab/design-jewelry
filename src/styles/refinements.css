@@ -170,7 +170,7 @@ h1, h2, h3, p, a, label { overflow-wrap: anywhere; }
 .navbar-header.on-home a,
 .navbar-header.on-home button,
 .navbar-header.on-home input { pointer-events: auto; }
-.navbar-header.on-home .nav-search-bar { background: transparent; border-bottom-color: rgba(255,255,255,.55); }
+.navbar-header.on-home .nav-search-bar { background: transparent; }
 .navbar-header.on-home .nav-search-input::placeholder { color: rgba(255,255,255,.82); }
 .navbar-header.on-home .nav-cat-link { text-shadow: 0 2px 8px rgba(0,0,0,.55); }
 .navbar-header.on-home .nav-logo-img { filter: drop-shadow(0 3px 12px rgba(0,0,0,.75)); }
