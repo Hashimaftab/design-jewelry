@@ -57,8 +57,6 @@ const ProductCard = ({ product, categorySlug }) => {
           )}
           {!product.inStock ? (
             <span className="product-card__badge product-card__badge--out">{t('product.outOfStock')}</span>
-          ) : product.quantity <= 3 ? (
-            <span className="product-card__badge">{t('product.onlyLeft', { count: product.quantity })}</span>
           ) : null}
           {product.onSale ? (
             <span className="product-card__badge product-card__badge--sale">

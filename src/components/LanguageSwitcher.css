@@ -28,6 +28,14 @@
   text-underline-offset: 0.28rem;
 }
 
+.on-other .language-switcher button {
+  color: #111827;
+}
+
+.on-other .language-switcher button.is-active {
+  color: #111827;
+}
+
 .language-switcher--floating {
   position: fixed;
   top: 1rem;

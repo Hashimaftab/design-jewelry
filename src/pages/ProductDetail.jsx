@@ -86,11 +86,7 @@ const ProductDetail = () => {
     );
   }
 
-  const stockLabel = product.inStock
-    ? product.quantity <= 3
-      ? t('product.onlyLeft', { count: product.quantity })
-      : t('category.inStock')
-    : t('product.outOfStock');
+  const stockLabel = product.inStock ? t('category.inStock') : t('product.outOfStock');
 
   const handleAddToBag = async () => {
     setBagMessage('');
@@ -168,17 +164,6 @@ const ProductDetail = () => {
               </span>
             </div>
 
-            <div
-              className={`product-detail__stock ${
-                product.inStock ? 'product-detail__stock--in' : 'product-detail__stock--out'
-              }`}
-            >
-              <span className="product-detail__stock-label">{t('product.availability')}</span>
-              <span className="product-detail__stock-value">{stockLabel}</span>
-              {product.inStock ? (
-                <span className="product-detail__stock-qty">{t('product.availableCount', { count: product.quantity })}</span>
-              ) : null}
-            </div>
 
             <div className="product-detail__description">
               <h2>{t('product.description')}</h2>
