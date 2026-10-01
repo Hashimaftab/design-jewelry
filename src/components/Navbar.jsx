@@ -45,10 +45,10 @@ const Navbar = () => {
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <Link to="/" className="nav-logo" aria-label={t('nav.home')}>
-              <BrandLogo isHome={isHome} className="nav-logo-img" />
-            </Link>
           </div>
+          <Link to="/" className="nav-logo" aria-label={t('nav.home')}>
+            <BrandLogo isHome={isHome} className="nav-logo-img" />
+          </Link>
 
           <form className="nav-search-bar" onSubmit={handleSearchSubmit} role="search">
             <Search size={18} className="nav-search-icon" aria-hidden="true" />

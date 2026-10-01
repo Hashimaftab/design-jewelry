@@ -16,7 +16,6 @@ import AdminPrivateRoute from './components/AdminPrivateRoute';
 import AdminPublicRoute from './components/AdminPublicRoute';
 
 import CartToast from './components/CartToast';
-import LanguageSwitcher from './components/LanguageSwitcher';
 import { useLanguage } from './context/LanguageContextValue';
 import './App.css';
 
@@ -43,7 +42,7 @@ function App() {
   const { t, language } = useLanguage();
   const isAdmin = location.pathname.startsWith('/admin');
   const hideNavbarFooter =
-    ['/checkout', '/login', '/signup'].includes(location.pathname) ||
+    ['/login', '/signup'].includes(location.pathname) ||
     isAdmin;
 
   useEffect(() => {
@@ -58,7 +57,6 @@ function App() {
       <a className="skip-link" href="#main-content">{storefrontText('app.skipToContent', 'Skip to content')}</a>
       {!isAdmin && <CartToast />}
       {!hideNavbarFooter && <Navbar />}
-      {hideNavbarFooter && !isAdmin ? <LanguageSwitcher floating /> : null}
       <main id="main-content">
         <Suspense fallback={<p className="route-loading" role="status">{storefrontText('common.loading', 'Loading…')}</p>}>
         <Routes>

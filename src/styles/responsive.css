@@ -134,22 +134,25 @@ body {
   }
 
   .nav-top-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     position: relative;
   }
 
-  .nav-actions {
-    position: absolute;
-    top: 50%;
-    right: max(1rem, env(safe-area-inset-right));
-    transform: translateY(-50%);
-    display: flex;
-    z-index: 1;
+  .nav-brand-section {
+    grid-column: 1;
   }
 
-  .nav-brand-section {
-    padding-right: 5.5rem;
+  .nav-logo {
+    grid-column: 2;
+  }
+
+  .nav-actions {
+    grid-column: 3;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
   }
 
   .nav-mobile-menu {
@@ -597,7 +600,6 @@ body {
 
   .nav-brand-section {
     gap: 0.1rem;
-    padding-right: 5rem;
   }
 
   .nav-actions {

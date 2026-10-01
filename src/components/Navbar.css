@@ -292,10 +292,20 @@
   }
 }
 
+@media (min-width: 769px) {
+  .nav-brand-section {
+    display: none;
+  }
+  .nav-logo {
+    flex: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-top-row {
     padding-top: 0.85rem;
     padding-bottom: 0.85rem;
+    position: relative;
   }
 
   .menu-toggle {
@@ -311,12 +321,13 @@
   }
 
   .nav-logo {
-    font-size: 1.3rem;
-    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .nav-actions {
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .nav-actions .wishlist-btn {

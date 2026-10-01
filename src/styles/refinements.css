@@ -45,7 +45,7 @@ h1, h2, h3, p, a, label { overflow-wrap: anywhere; }
     padding: 8px clamp(1rem, 4vw, 4rem);
   }
   .on-home .nav-top-row { display: contents; }
-  .on-home .nav-brand-section { grid-area: 1 / 1 / 3 / 2; }
+  .on-home .nav-logo { grid-area: 1 / 1 / 3 / 2; align-self: center; flex: none; }
   .on-home .nav-logo-img { height: 60px; max-width: 150px; }
   .on-home .nav-search-bar { grid-area: 1 / 2; margin: 0; justify-self: center; align-self: center; }
   .on-home .nav-actions { grid-area: 1 / 3 / 3 / 4; }
@@ -109,7 +109,7 @@ h1, h2, h3, p, a, label { overflow-wrap: anywhere; }
   html { font-size: 16px; }
   .nav-top-row { gap: .5rem; }
   .nav-brand-section { gap: .35rem; }
-  .nav-logo-img, .on-other .nav-logo-img { height: 52px; max-width: 130px; }
+  .nav-logo-img, .on-other .nav-logo-img { height: 50px; max-width: 130px; margin-bottom: 10px; }
   .nav-actions { flex: 0 0 auto; gap: 0; }
   .on-home .nav-top-row { height: var(--home-header-height); padding-block: 10px; }
   .hero-section { min-height: 540px; }
