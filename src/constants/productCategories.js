@@ -30,3 +30,6 @@ export const CATEGORY_SLUG_TO_DB = {
   rings: 'ring',
   gifts: 'gift',
 };
+
+// Admin collection controls share the full existing category list.
+export const ADMIN_PRODUCT_CATEGORIES = PRODUCT_CATEGORIES;

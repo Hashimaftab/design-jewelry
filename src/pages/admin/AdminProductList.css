@@ -92,6 +92,21 @@
   font-weight: 500;
 }
 
+.admin-product-list__category {
+  min-width: 8.5rem;
+  padding: 0.6rem;
+  border: 1px solid rgba(54, 69, 79, 0.2);
+  border-radius: 4px;
+  background: var(--color-surface, #fff);
+  color: var(--color-charcoal, #36454f);
+  font: inherit;
+}
+
+.admin-product-list__category:disabled,
+.admin-product-list__action:disabled { opacity: 0.6; cursor: wait; }
+.admin-product-list__category + small { display: block; margin-top: 0.3rem; }
+.admin-product-list__notice { margin-bottom: 1rem; color: #286345; }
+
 .admin-product-list__pill {
   display: inline-block;
   padding: 0.25rem 0.65rem;

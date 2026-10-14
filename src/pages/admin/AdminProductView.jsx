@@ -2,13 +2,13 @@ import { formatStorePrice as formatMoney } from '../../utils/currency';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link, Navigate } from 'react-router-dom';
 import { ArrowLeft, Pencil, Sparkles } from 'lucide-react';
-import { getProduct } from '../../api/products.api';
+import { getProduct, getCollectionProduct } from '../../api/products.api';
 import { parseProductResponse } from '../../utils/productHelpers';
 import { isValidCategory, getCategoryLabel } from '../../constants/productCategories';
 import { getApiErrorMessage } from '../../utils/adminAuth';
 
 
-const AdminProductView = () => {
+const AdminProductView = ({ allCollections = false }) => {
   const { id, category } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
@@ -16,7 +16,7 @@ const AdminProductView = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isValidCategory(category)) {
+    if (!allCollections && !isValidCategory(category)) {
       setLoading(false);
       return;
     }
@@ -26,7 +26,7 @@ const AdminProductView = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await getProduct(category, id);
+        const res = await (allCollections ? getCollectionProduct(id) : getProduct(category, id));
         const p = parseProductResponse(res);
         if (cancelled) return;
         if (!p) setError('Invalid response.');
@@ -41,14 +41,14 @@ const AdminProductView = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, category]);
+  }, [allCollections, id, category]);
 
-  if (!isValidCategory(category)) {
+  if (!allCollections && !isValidCategory(category)) {
     return <Navigate to="/admin/products/necklaces" replace />;
   }
 
-  const label = getCategoryLabel(category);
-  const listPath = `/admin/products/${category}`;
+  const label = allCollections ? 'All Collection' : getCategoryLabel(category);
+  const listPath = allCollections ? '/admin/collections' : `/admin/products/${category}`;
 
   if (loading) {
     return (
@@ -86,7 +86,7 @@ const AdminProductView = () => {
         <h2 className="admin-product-form__title">{product.name}</h2>
         </div>
         <Link
-          to={`/admin/products/${category}/${product.id}/edit`}
+          to={`${listPath}/${product.id}/edit`}
           className="admin-product-view__edit"
         >
           <Pencil size={16} />
@@ -98,7 +98,7 @@ const AdminProductView = () => {
         <dt>ID</dt>
         <dd>{product.id}</dd>
         <dt>Category</dt>
-        <dd>{product.category}</dd>
+        <dd>{getCategoryLabel(product.categorySlug)}</dd>
         <dt>Price</dt>
         <dd>
           {product.onSale ? <><del>{formatMoney(product.originalPrice)}</del>{' '}</> : null}

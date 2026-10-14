@@ -101,6 +101,10 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="collections" element={<AdminProductList allCollections />} />
+            <Route path="collections/new" element={<AdminProductForm allCollections />} />
+            <Route path="collections/:id/view" element={<AdminProductView allCollections />} />
+            <Route path="collections/:id/edit" element={<AdminProductForm allCollections />} />
             <Route path="products" element={<Navigate to="/admin/products/necklaces" replace />} />
             <Route path="products/:category/new" element={<AdminProductForm />} />
             <Route path="products/:category/:id/view" element={<AdminProductView />} />

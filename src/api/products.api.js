@@ -30,7 +30,9 @@ export function productsBasePath(categorySlug) {
  */
 export function buildProductFormData(fields) {
   const form = new FormData();
-  const { name, description, price, discountPercent, quantity, isAvailable, image, images, existingImages } = fields;
+  const { name, description, price, discountPercent, quantity, isAvailable, image, images, existingImages, category } = fields;
+
+  if (category !== undefined) form.append('category', category);
 
   if (name !== undefined) form.append('name', name);
   if (description !== undefined) form.append('description', description);
@@ -90,3 +92,10 @@ export const updateProduct = (categorySlug, productId, formData) =>
  */
 export const deleteProduct = (categorySlug, productId) =>
   adminAxiosInstance.delete(`${productsBasePath(categorySlug)}/${productId}`);
+
+export const listAllProducts = (params = {}) => adminAxiosInstance.get('/admin/products', { params });
+export const getCollectionProduct = (id) => adminAxiosInstance.get(`/admin/products/${id}`);
+export const updateCollectionProduct = (id, data) => adminAxiosInstance.put(`/admin/products/${id}`, data);
+export const deleteCollectionProduct = (id) => adminAxiosInstance.delete(`/admin/products/${id}`);
+export const changeProductCategory = (id, category) =>
+  adminAxiosInstance.patch(`/admin/products/${id}/category`, { category });

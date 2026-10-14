@@ -5,4 +5,9 @@ export {
   createProduct,
   updateProduct,
   deleteProduct,
+  listAllProducts,
+  getCollectionProduct,
+  updateCollectionProduct,
+  deleteCollectionProduct,
+  changeProductCategory,
 } from '../../products.api';

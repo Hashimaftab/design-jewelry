@@ -65,6 +65,15 @@ const AdminLayout = () => {
           </NavLink>
 
           <p className="admin-sidebar__section-label">Collections</p>
+          <NavLink
+            to="/admin/collections"
+            className={({ isActive }) => `admin-nav-link${isActive ? ' admin-nav-link--active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+          >
+            <ShoppingBag size={18} strokeWidth={1.5} aria-hidden />
+            <span>All Collection</span>
+            <ChevronRight className="admin-nav-link__chev" size={14} strokeWidth={1.5} aria-hidden />
+          </NavLink>
           {PRODUCT_CATEGORIES.map(({ slug, label }) => {
             const Icon = categoryIcon[slug] || Gem;
             return (

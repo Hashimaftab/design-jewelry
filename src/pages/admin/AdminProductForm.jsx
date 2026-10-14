@@ -6,14 +6,16 @@ import {
   createProduct,
   updateProduct,
   getProduct,
+  getCollectionProduct,
+  updateCollectionProduct,
 } from '../../api/products.api';
 import { parseProductResponse } from '../../utils/productHelpers';
-import { isValidCategory, getCategoryLabel } from '../../constants/productCategories';
+import { isValidCategory, getCategoryLabel, ADMIN_PRODUCT_CATEGORIES, CATEGORY_SLUG_TO_DB } from '../../constants/productCategories';
 import { getApiErrorMessage } from '../../utils/adminAuth';
 
 const MAX_IMAGES = 4;
 
-const AdminProductForm = () => {
+const AdminProductForm = ({ allCollections = false }) => {
   const { category, id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -32,6 +34,7 @@ const AdminProductForm = () => {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('necklaces');
 
   useEffect(() => {
     return () => {
@@ -44,10 +47,11 @@ const AdminProductForm = () => {
   }, [images]);
 
   useEffect(() => {
-    if (!isValidCategory(category)) return;
+    if (!allCollections && !isValidCategory(category)) return;
 
     if (!isEdit) {
       setName('');
+      setSelectedCategory(category || 'necklaces');
       setDescription('');
       setPrice('');
       setDiscountPercent('0');
@@ -65,7 +69,7 @@ const AdminProductForm = () => {
       setLoading(true);
       setError('');
       try {
-        const res = await getProduct(category, id);
+        const res = await (allCollections ? getCollectionProduct(id) : getProduct(category, id));
         const p = parseProductResponse(res);
         if (cancelled) return;
         if (!p) {
@@ -74,6 +78,7 @@ const AdminProductForm = () => {
         }
         setNotFound(false);
         setName(p.name);
+        setSelectedCategory(p.categorySlug);
         setDescription(p.description);
         setPrice(String(p.price));
         setDiscountPercent(String(p.discountPercent ?? 0));
@@ -105,7 +110,7 @@ const AdminProductForm = () => {
     return () => {
       cancelled = true;
     };
-  }, [category, id, isEdit]);
+  }, [allCollections, category, id, isEdit]);
 
   const handleImageFilesAdd = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -215,6 +220,7 @@ const AdminProductForm = () => {
       const newFiles = images.filter((it) => it.file instanceof File).map((it) => it.file);
 
       const fields = {
+        ...(allCollections && isEdit ? { category: CATEGORY_SLUG_TO_DB[selectedCategory] } : {}),
         name: name.trim(),
         description: description.trim(),
         price: priceNum,
@@ -228,11 +234,12 @@ const AdminProductForm = () => {
       const form = buildProductFormData(fields);
 
       if (isCreate) {
-        await createProduct(category, form);
+        await createProduct(allCollections ? selectedCategory : category, form);
       } else {
-        await updateProduct(category, id, form);
+        if (allCollections) await updateCollectionProduct(id, form);
+        else await updateProduct(category, id, form);
       }
-      navigate(`/admin/products/${category}`, { replace: true });
+      navigate(listPath, { replace: true });
     } catch (err) {
       setError(getApiErrorMessage(err, 'Save failed.'));
     } finally {
@@ -240,12 +247,12 @@ const AdminProductForm = () => {
     }
   };
 
-  if (!isValidCategory(category)) {
+  if (!allCollections && !isValidCategory(category)) {
     return <Navigate to="/admin/products/necklaces" replace />;
   }
 
-  const label = getCategoryLabel(category);
-  const listPath = `/admin/products/${category}`;
+  const label = allCollections ? 'All Collection' : getCategoryLabel(category);
+  const listPath = allCollections ? '/admin/collections' : `/admin/products/${category}`;
 
   if (notFound) {
     return (
@@ -279,7 +286,7 @@ const AdminProductForm = () => {
 
       <div className="admin-eyebrow"><Sparkles size={14} />Collection Studio</div>
       <h2 className="admin-product-form__title">
-        {isCreate ? `Add ${label.toLowerCase().slice(0, -1)}` : 'Edit product'}
+        {isCreate ? (allCollections ? 'Add product' : `Add ${label.toLowerCase().slice(0, -1)}`) : 'Edit product'}
       </h2>
 
       {error ? (
@@ -291,13 +298,20 @@ const AdminProductForm = () => {
       <form className="admin-product-form__form" onSubmit={handleSubmit}>
         <div className="admin-product-form__field">
           <label htmlFor="p-cat">Collection</label>
-          <input
+          {allCollections ? (
+            <select id="p-cat" className="admin-product-form__input" value={selectedCategory}
+              onChange={(event) => setSelectedCategory(event.target.value)} disabled={saving} required>
+              {ADMIN_PRODUCT_CATEGORIES.map(({ slug, label: categoryLabel }) => (
+                <option key={slug} value={slug}>{categoryLabel}</option>
+              ))}
+            </select>
+          ) : <input
             id="p-cat"
             type="text"
             value={label}
             disabled
             className="admin-product-form__input admin-product-form__input--disabled"
-          />
+          />}
         </div>
 
         <div className="admin-product-form__field">
