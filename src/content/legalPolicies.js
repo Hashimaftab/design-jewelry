@@ -87,36 +87,50 @@ export const legalPolicies = {
       sections: [],
     },
     returns: {
-      eyebrow: 'Retourneren & garantie',
-      title: 'Retourbeleid',
-      introTitle: 'Retourneren, ruilen & garantie',
+      eyebrow: 'Retourneren & terugbetalingen',
+      title: 'Retour- en terugbetalingsbeleid',
+      introTitle: 'Retourneren & terugbetalingen',
       intro: [],
       sections: [
         {
-          title: '30 dagen retourneren en ruilen — zonder vragen',
+          title: '1. Retourneren',
           paragraphs: [
-            'Je kunt elk HUSN-artikel binnen 30 dagen na aankoop om welke reden dan ook retourneren of ruilen.',
-            'Of je nu van gedachten bent veranderd, het een cadeau was of het artikel gewoon niet aan je verwachtingen voldeed — wij helpen je graag.',
+            'Je hebt vanaf de ontvangst van je bestelling 14 dagen de tijd om je aankoop zonder opgave van reden te annuleren. Nadat je ons hiervan op de hoogte hebt gesteld, heb je nog eens 14 dagen om je artikelen te retourneren.',
           ],
         },
         {
-          title: '3 maanden garantie op productiefouten',
-          intro: 'Alle HUSN-sieraden hebben 3 maanden garantie op productiegerelateerde problemen, waaronder:',
+          title: '2. Retourkosten',
+          paragraphs: [
+            'De kosten voor retourzending bij een retour vanwege bedenktijd zijn voor rekening van de klant, mits dit vóór de aankoop is gecommuniceerd. Is een artikel defect of onjuist geleverd, neem dan contact met ons op voor hulp.',
+          ],
+        },
+        {
+          title: '3. Terugbetalingen',
+          paragraphs: [
+            'Terugbetalingen worden binnen de wettelijk vereiste termijn verwerkt. De oorspronkelijke kosten voor standaardlevering worden terugbetaald wanneer dit wettelijk verplicht is.',
+          ],
+        },
+        {
+          title: '4. Sieradenverzorging',
+          paragraphs: [
+            'Onze sieraden zijn ontworpen als aanvulling op je dagelijkse stijl. Met een beetje extra zorg blijven je favoriete sieraden langer mooi.',
+            'Om hun uitstraling te behouden, raden we aan je sieraden op een droge plaats te bewaren, direct contact met parfum en agressieve chemicaliën te vermijden en ze af te doen voordat je gaat douchen, zwemmen of sporten. Maak ze na gebruik voorzichtig schoon met een zachte doek.',
+            'Zoals bij alle sieraden kunnen de juiste verzorging en bewust dragen helpen om de schoonheid en afwerking van je sieraden langer te behouden.',
+          ],
+        },
+        {
+          title: '5. Defecte artikelen',
+          paragraphs: [
+            'Als je artikel beschadigd aankomt of je denkt dat het defect is, neem dan contact met ons op via husnjewelryx@gmail.com. Wij beoordelen het probleem zorgvuldig in overeenstemming met het Nederlandse consumentenrecht.',
+            'Je wettelijke consumentenrechten blijven onverminderd van kracht.',
+          ],
+        },
+        {
+          title: '6. Contact',
           bullets: [
-            { text: 'Kleurverandering of gebreken aan de coating' },
-            { text: 'Gebroken kettingen of sluitingen' },
-            { text: 'Verloren stenen' },
-            { text: 'Fabricage- of materiaalfouten' },
-          ],
-          paragraphs: [
-            'Treedt een van deze problemen op? Breng het artikel dan terug. Wij vervangen het door een nieuw sieraad van gelijke waarde.',
-          ],
-        },
-        {
-          title: 'Onze belofte',
-          paragraphs: [
-            'Wij vinden dat sieraden gedragen, geliefd en beleefd moeten worden — niet opgeborgen in een doos.',
-            'Daarom richten wij ons op duurzame, waterbestendige en huidvriendelijke sieraden, en doen wij altijd ons best om een passende oplossing voor je te vinden.',
+            { label: 'Bedrijfsnaam', text: 'HUSN BV' },
+            { label: 'E-mail', text: 'husnjewelryx@gmail.com' },
+            { label: 'Retouradres', text: 'Neem vóór verzending contact op via husnjewelryx@gmail.com voor retourinstructies en het juiste retouradres.' },
           ],
         },
       ],
@@ -302,36 +316,50 @@ export const legalPolicies = {
       sections: [],
     },
     returns: {
-      eyebrow: 'Returns & warranty',
-      title: 'Return Policy',
-      introTitle: 'Returns, Exchanges & Warranty',
+      eyebrow: 'Returns & refunds',
+      title: 'Returns & Refunds Policy',
+      introTitle: 'Returns & Refunds',
       intro: [],
       sections: [
         {
-          title: '30-Day Returns & Exchanges — No Questions Asked',
+          title: '1. Returns',
           paragraphs: [
-            'You can return or exchange any HUSN item within 30 days of purchase for any reason.',
-            'Whether you changed your mind, it was a gift, or it simply wasn’t what you expected — we’re happy to help.',
+            'You have 14 days from receiving your order to cancel your purchase without giving a reason. After notifying us, you have a further 14 days to return your items.',
           ],
         },
         {
-          title: '3-Month Warranty on Production Issues',
-          intro: 'All HUSN jewelry is covered by a 3-month warranty against production-related issues, including:',
+          title: '2. Return Shipping',
+          paragraphs: [
+            'Customers pay return shipping costs for change-of-mind returns, provided this is communicated before purchase. If an item is defective or incorrect, please contact us for assistance.',
+          ],
+        },
+        {
+          title: '3. Refunds',
+          paragraphs: [
+            'Refunds will be processed within the legally required timeframe. Original standard delivery costs will be refunded where required by law.',
+          ],
+        },
+        {
+          title: '4. Jewelry Care',
+          paragraphs: [
+            'Our jewelry is designed to complement your everyday style. With a little extra care, you can keep your favorite pieces looking beautiful for longer.',
+            'To maintain their appearance, we recommend storing your jewelry in a dry place, avoiding direct contact with perfumes and harsh chemicals, and removing your pieces before showering, swimming, or exercising. Gently clean them with a soft cloth after use.',
+            'As with all jewelry, proper care and mindful wear can help preserve the beauty and finish of your pieces over time.',
+          ],
+        },
+        {
+          title: '5. Defective Items',
+          paragraphs: [
+            'If your item arrives damaged or you believe it is defective, contact us at husnjewelryx@gmail.com. We will assess the issue fairly in accordance with Dutch consumer law.',
+            'Your statutory consumer rights remain unaffected.',
+          ],
+        },
+        {
+          title: '6. Contact',
           bullets: [
-            { text: 'Color change or coating defects' },
-            { text: 'Broken chains or clasps' },
-            { text: 'Lost stones' },
-            { text: 'Manufacturing or material faults' },
-          ],
-          paragraphs: [
-            'If any of these occur, simply bring your item back and we will replace it with a new piece of equal value.',
-          ],
-        },
-        {
-          title: 'Our Promise',
-          paragraphs: [
-            'We believe jewelry should be worn, loved, and enjoyed — not hidden in a box.',
-            'That’s why we focus on long-lasting, water-resistant, and skin-friendly pieces, and we always aim to make things right for you.',
+            { label: 'Business Name', text: 'HUSN BV' },
+            { label: 'Email', text: 'husnjewelryx@gmail.com' },
+            { label: 'Return Address', text: 'Contact us at husnjewelryx@gmail.com before shipping for return instructions and the correct return address.' },
           ],
         },
       ],
