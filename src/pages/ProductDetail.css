@@ -222,14 +222,18 @@
 }
 
 .product-detail__checkout-link {
-  display: inline-block;
-  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  text-align: center;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--gold-primary);
-  border-bottom: 1px solid currentColor;
-  padding-bottom: 2px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 1rem;
   transition: all 0.3s ease;
 }
 
@@ -239,11 +243,20 @@
 }
 
 /* Luxurious Animated CTA Button */
+.product-detail__actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .85rem;
+  margin-top: 1.75rem;
+  max-width: 440px;
+}
+
 .product-detail__cta {
   position: relative;
-  margin-top: 1.75rem;
+  margin-top: 0;
   width: 100%;
-  max-width: 340px;
+  max-width: none;
+  min-height: 56px;
   padding: 1.2rem 2.4rem;
   background: #211b17;
   color: #ffffff;

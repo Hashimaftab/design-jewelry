@@ -79,10 +79,10 @@ export const ordersApi = {
    * @param {'pending'|'delivered'|'shipped'|'processing'|'cancelled'} status
    * @returns {Promise<{status: string, message: string, data: Object}>}
    */
-  async updateShippingStatus(orderId, status) {
+  async updateShippingStatus(orderId, status, shipment) {
     const response = await request(`/admin/orders/${orderId}`, {
       method: 'PATCH',
-      body: { shippingStatus: status },
+      body: { shippingStatus: status, ...(shipment ? { shipment } : {}) },
     });
     return { ...response, data: response.data.order };
   },

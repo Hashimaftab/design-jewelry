@@ -4,6 +4,7 @@ import { ShoppingBag, Search, User, Menu, X, Heart } from 'lucide-react';
 import { AuthContext } from '../context/AuthContextValue';
 import { useCart } from '../context/CartContextValue';
 import BrandLogo from './BrandLogo';
+import ShippingAnnouncement from './ShippingAnnouncement';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '../context/LanguageContextValue';
 import './Navbar.css';
@@ -32,6 +33,7 @@ const Navbar = () => {
 
   return (
     <header className={`navbar-header ${isHome ? 'on-home' : 'on-other'}`}>
+      {isHome && <ShippingAnnouncement />}
       <nav className="navbar-container">
     
         <div className="container nav-top-row">

@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { ordersApi } from '../../api/ordersApiClient';
+import ShipmentEmailDialog from '../../components/admin/ShipmentEmailDialog';
 import { getOrderLabel, getOrderCustomerName, formatOrderAmount } from '../../utils/adminOrderHelpers';
 
 const STATUS_OPTIONS = [
@@ -73,6 +74,8 @@ const AdminOrders = () => {
 
   // Selected Order for Detail Modal
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [shipmentOrder, setShipmentOrder] = useState(null);
+  const [shipmentError, setShipmentError] = useState('');
 
   // Updating statuses state (id -> boolean)
   const [updatingId, setUpdatingId] = useState(null);
@@ -150,13 +153,19 @@ const AdminOrders = () => {
     setPage(1);
   };
 
-  const handleUpdateShippingStatus = async (orderId, newStatus) => {
+  const handleUpdateShippingStatus = async (orderId, newStatus, shipment) => {
+    const targetOrder = orders.find((o) => o.id === orderId) || selectedOrder;
+    if (newStatus === 'shipped' && !shipment) {
+      setShipmentError('');
+      setShipmentOrder(targetOrder);
+      return;
+    }
     setUpdatingId(orderId);
-    const targetOrder = orders.find((o) => o.id === orderId);
+    setShipmentError('');
     const orderNum = getOrderLabel(targetOrder || { id: orderId });
 
     try {
-      const res = await ordersApi.updateShippingStatus(orderId, newStatus);
+      const res = await ordersApi.updateShippingStatus(orderId, newStatus, shipment);
       const updatedOrder = res?.data || { ...targetOrder, shippingStatus: newStatus };
 
       // Update in orders list
@@ -182,9 +191,11 @@ const AdminOrders = () => {
       });
 
       const readableStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-      showToast(`Order ${orderNum} status updated to ${readableStatus}`, 'success');
+      if (shipment) setShipmentOrder(null);
+      showToast(shipment ? `Order ${orderNum} marked shipped. Email queued for delivery.` : `Order ${orderNum} status updated to ${readableStatus}`, 'success');
       await fetchOrders(true);
     } catch (err) {
+      if (shipment) setShipmentError(err.message || 'Could not queue the shipping email. Please retry.');
       showToast(err.message || `Failed to update status for ${orderNum}`, 'error');
     } finally {
       setUpdatingId(null);
@@ -259,6 +270,13 @@ const AdminOrders = () => {
 
   return (
     <div className="admin-orders-page">
+      {shipmentOrder && <ShipmentEmailDialog
+        order={shipmentOrder}
+        busy={updatingId === shipmentOrder.id}
+        error={shipmentError}
+        onCancel={() => setShipmentOrder(null)}
+        onSend={(shipment) => handleUpdateShippingStatus(shipmentOrder.id, 'shipped', shipment)}
+      />}
       {/* Toast Alert */}
       {toast ? (
         <aside

@@ -9,6 +9,7 @@ import BrandLogo from '../components/BrandLogo';
 import { formatStorePrice } from '../api/payments.api';
 import { checkoutPayload, prepareCheckoutAttempt, readCheckoutAttempt, clearCheckoutAttempt } from '../utils/checkoutAttempt';
 import { useLanguage } from '../context/LanguageContextValue';
+import { useCheckoutQuote } from '../hooks/useCheckoutQuote';
 
 
 const Checkout = () => {
@@ -19,6 +20,7 @@ const Checkout = () => {
     return translated === key ? getCategoryLabel(slug) : translated;
   };
   const { cart, loading, cartError, refreshCart, updateQuantity, removeItem, placeOrder } = useCart();
+  const { quote, quoteError, retryQuote } = useCheckoutQuote(cart);
   const { user } = useContext(AuthContext) || {};
   const submitting = useRef(false);
   const owner = user?.id || 'guest';
@@ -68,7 +70,7 @@ const Checkout = () => {
     if (e) e.preventDefault();
     setError('');
 
-    if (submitting.current || loading || busyId !== null || cartError) return;
+    if (submitting.current || loading || busyId !== null || cartError || !quote) return;
     submitting.current = true;
     setCheckoutBusy(true);
     try {
@@ -129,7 +131,7 @@ const Checkout = () => {
               <h2>{t('checkout.yourSelection')}</h2>
               <span className="luxury-tag">
                 <Sparkles size={13} />
-                <span>{t('checkout.insuredDelivery')}</span>
+                <span>{t('checkout.shippingOffer')}</span>
               </span>
             </div>
             <p className="form-desc">{t('checkout.guestText')}</p>
@@ -356,7 +358,7 @@ const Checkout = () => {
                 <button
                   type="submit"
                   className="pay-now-btn"
-                  disabled={checkoutBusy || loading || busyId !== null}
+                  disabled={checkoutBusy || loading || busyId !== null || !quote}
                 >
                   {checkoutBusy ? (
                     <span className="btn-loading-state">
@@ -410,16 +412,29 @@ const Checkout = () => {
             <div className="summary-totals">
               <div className="total-row">
                 <span>{t('checkout.subtotalItems', { count: cart.itemCount })}</span>
-                <span>{formatStorePrice(cart.subtotal, locale)}</span>
+                <span>{formatStorePrice(quote?.subtotalAmount ?? cart.subtotal, locale)}</span>
               </div>
-              <div className="total-row">
-                <span>{t('checkout.shippingTaxes')}</span>
-                <span>{t('checkout.calculatedPayment')}</span>
-              </div>
-              <div className="total-row grand-total">
-                <span>{t('checkout.itemsSubtotal')}</span>
-                <span>{formatStorePrice(cart.subtotal, locale)}</span>
-              </div>
+              {quote ? (
+                <>
+                  <div className="total-row">
+                    <span>{t('payment.vat')} ({quote.vatRatePercent}%)</span>
+                    <span>{formatStorePrice(quote.vatAmount, locale)}</span>
+                  </div>
+                  <div className="total-row">
+                    <span>{t('payment.shipping')}</span>
+                    <span>{quote.shippingAmount === 0 ? t('checkout.free') : formatStorePrice(quote.shippingAmount, locale)}</span>
+                  </div>
+                  <div className="total-row grand-total">
+                    <span>{t('payment.total')}</span>
+                    <span>{formatStorePrice(quote.grandTotalAmount, locale)}</span>
+                  </div>
+                </>
+              ) : cart.items.length > 0 ? (
+                <div role={quoteError ? 'alert' : 'status'}>
+                  <p>{t(quoteError ? 'checkout.totalsError' : 'checkout.totalsLoading')}</p>
+                  {quoteError && <button type="button" onClick={retryQuote}>{t('checkout.retryTotals')}</button>}
+                </div>
+              ) : null}
             </div>
           </div>
         </aside>

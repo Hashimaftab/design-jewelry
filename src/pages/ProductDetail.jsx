@@ -86,8 +86,6 @@ const ProductDetail = () => {
     );
   }
 
-  const stockLabel = product.inStock ? t('category.inStock') : t('product.outOfStock');
-
   const handleAddToBag = async () => {
     setBagMessage('');
 
@@ -200,6 +198,7 @@ const ProductDetail = () => {
               </p>
             ) : null}
 
+            <div className="product-detail__actions">
             <button
               type="button"
               className={`product-detail__cta ${justAdded ? 'product-detail__cta--added' : ''}`}
@@ -231,6 +230,7 @@ const ProductDetail = () => {
                 {t('product.viewBag')}
               </Link>
             ) : null}
+            </div>
           </div>
         </div>
       </div>

@@ -295,10 +295,10 @@ const Payment = () => {
                     <strong>{formatStorePrice(summary.vatAmount, locale)}</strong>
                   </div>
                 ) : null}
-                {summary.shippingAmount > 0 ? (
+                {summary.shippingAmount >= 0 ? (
                   <div className="summary-item">
                     <span>{t('payment.shipping')}</span>
-                    <strong>{formatStorePrice(summary.shippingAmount, locale)}</strong>
+                    <strong>{summary.shippingAmount === 0 ? t('checkout.free') : formatStorePrice(summary.shippingAmount, locale)}</strong>
                   </div>
                 ) : null}
                 <div className="summary-item grand-total">

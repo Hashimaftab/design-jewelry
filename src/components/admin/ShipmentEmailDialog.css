@@ -1,0 +1,21 @@
+.shipment-email { width: min(640px, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); margin: auto; padding: 0; border: 1px solid #e5dccb; border-radius: 12px; background: #fffdf9; color: #29241f; box-shadow: 0 24px 80px #0003; }
+.shipment-email::backdrop { background: #0007; }
+.shipment-email form { display: flex; flex-direction: column; max-height: calc(100dvh - 2rem); }
+.shipment-email__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5dccb; }
+.shipment-email__header h2 { margin: 0; font-size: 1.5rem; }
+.shipment-email__header p { margin: .25rem 0 0; color: #686159; }
+.shipment-email button { min-height: 44px; padding: .65rem 1rem; border: 1px solid #d6c9b4; border-radius: 5px; background: white; color: inherit; cursor: pointer; }
+.shipment-email__header button { display: grid; place-items: center; padding: .5rem; }
+.shipment-email__body { padding: 1.5rem; overflow-y: auto; }
+.shipment-email label { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1rem; font-size: .9rem; font-weight: 600; }
+.shipment-email input, .shipment-email textarea { width: 100%; padding: .7rem .8rem; border: 1px solid #d6c9b4; border-radius: 5px; background: white; color: #29241f; font-weight: 400; }
+.shipment-email input[readonly] { background: #f3eee6; }
+.shipment-email textarea { resize: vertical; min-height: 110px; }
+.shipment-email__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.shipment-email__preview { padding: .75rem 1rem; background: #f3eee6; border-radius: 5px; overflow-wrap: anywhere; }
+.shipment-email__preview p { margin: .25rem 0; }
+.shipment-email__hint { margin-top: .75rem; font-size: .85rem; color: #686159; }
+.shipment-email__error { margin-top: 1rem; color: #a52828; }
+.shipment-email__footer { padding: 1rem 1.5rem; border-top: 1px solid #e5dccb; display: flex; justify-content: flex-end; gap: .75rem; }
+.shipment-email .shipment-email__send { display: flex; align-items: center; justify-content: center; gap: .5rem; background: #211b17; color: white; }
+@media(max-width: 540px) { .shipment-email__fields { grid-template-columns: 1fr; gap: 0; } .shipment-email__footer { flex-direction: column-reverse; } }

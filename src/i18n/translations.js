@@ -3,6 +3,7 @@ export const SUPPORTED_LANGUAGES = ['nl', 'en'];
 
 export const translations = {
   nl: {
+    'cart.checkoutNotice': 'Btw en eventuele verzendkosten worden bij het afrekenen toegevoegd.',
     'language.dutch': 'Nederlands',
     'language.english': 'Engels',
     'language.choose': 'Taal kiezen',
@@ -72,6 +73,14 @@ export const translations = {
     'legal.husnCompany': 'HUSN BV · Nederland',
     'legal.website': 'Website',
     'legal.email': 'E-mail',
+    'home.freeShipping': 'Gratis verzending vanaf €40',
+    'home.pauseAnnouncement': 'Verzendbericht pauzeren',
+    'home.resumeAnnouncement': 'Verzendbericht hervatten',
+    'checkout.shippingOffer': 'Gratis verzending vanaf €40',
+    'checkout.free': 'Gratis',
+    'checkout.totalsLoading': 'Btw en verzendkosten berekenen…',
+    'checkout.totalsError': 'Het totaal kon niet worden berekend. Probeer het opnieuw vóór het bestellen.',
+    'checkout.retryTotals': 'Totaal opnieuw berekenen',
     'home.heroEyebrow': 'Ontdek de nieuwe collectie',
     'home.heroTitle': 'Ethereal radiance',
     'home.shopCollection': 'Bekijk de collectie',
@@ -301,6 +310,15 @@ export const translations = {
     'status.cancelled': 'Geannuleerd',
   },
   en: {
+    'cart.checkoutNotice': 'VAT and any shipping charges will be added at checkout.',
+    'home.freeShipping': 'Free shipping on orders of €40 or more',
+    'home.pauseAnnouncement': 'Pause shipping announcement',
+    'home.resumeAnnouncement': 'Resume shipping announcement',
+    'checkout.shippingOffer': 'Free shipping from €40',
+    'checkout.free': 'Free',
+    'checkout.totalsLoading': 'Calculating VAT and shipping…',
+    'checkout.totalsError': 'Could not calculate your total. Please retry before placing your order.',
+    'checkout.retryTotals': 'Retry calculating total',
     'language.dutch': 'Dutch', 'language.english': 'English', 'language.choose': 'Choose language',
     'common.loading': 'Loading…', 'common.previous': 'Previous', 'common.next': 'Next', 'common.pageOf': 'Page {{page}} of {{total}}',
     'common.backToStore': 'Return to Store', 'common.backToShop': 'Back to shop', 'common.customer': 'customer', 'common.yes': 'Yes',
