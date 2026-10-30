@@ -20,13 +20,12 @@ const VARIANT_META = {
 };
 
 const AllProducts = ({ variant = 'all' }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +33,7 @@ const AllProducts = ({ variant = 'all' }) => {
       setLoading(true);
       setError('');
       try {
-        const result = await listAllCatalogProducts({ page, limit: PAGE_SIZE, inStockOnly });
+        const result = await listAllCatalogProducts({ page, limit: PAGE_SIZE, locale: language });
         if (!cancelled) {
           setProducts(result.products);
           setTotalPages(result.totalPages);
@@ -50,7 +49,7 @@ const AllProducts = ({ variant = 'all' }) => {
     };
     load();
     return () => { cancelled = true; };
-  }, [page, inStockOnly, t]);
+  }, [language, page, t]);
 
   const meta = VARIANT_META[variant] ?? VARIANT_META.all;
 
@@ -62,25 +61,6 @@ const AllProducts = ({ variant = 'all' }) => {
       </div>
 
       <div className="container">
-        <div className="category-filters">
-          <div className="filter-group">
-            <button
-              type="button"
-              className={`filter-btn ${!inStockOnly ? 'active' : ''}`}
-              onClick={() => { setPage(1); setInStockOnly(false); }}
-            >
-              {t('category.all')}
-            </button>
-            <button
-              type="button"
-              className={`filter-btn ${inStockOnly ? 'active' : ''}`}
-              onClick={() => { setPage(1); setInStockOnly(true); }}
-            >
-              {t('category.inStock')}
-            </button>
-          </div>
-        </div>
-
         {error ? (
           <p className="category-error" role="alert">
             {error}

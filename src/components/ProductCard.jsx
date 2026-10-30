@@ -55,9 +55,6 @@ const ProductCard = ({ product, categorySlug }) => {
           ) : (
             <div className="media-frame__placeholder" aria-hidden />
           )}
-          {!product.inStock ? (
-            <span className="product-card__badge product-card__badge--out">{t('product.outOfStock')}</span>
-          ) : null}
           {product.onSale ? (
             <span className="product-card__badge product-card__badge--sale">
               {t('product.saleBadge', { percent: product.discountPercent })}

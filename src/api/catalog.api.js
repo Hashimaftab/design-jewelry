@@ -27,35 +27,28 @@ export const CATALOG_ENDPOINTS = {
 
 /**
  * All categories combined, newest first.
- * @param {{ page?: number, limit?: number, search?: string, inStockOnly?: boolean }} [params]
+ * @param {{ page?: number, limit?: number, search?: string, locale?: 'nl'|'en' }} [params]
  */
 export const listAllCatalogProducts = async (params = {}) => {
-  const query = { ...params };
-  if (query.inStockOnly) {
-    query.inStockOnly = true;
-  }
-  const res = await axiosInstance.get(CATALOG_ROUTES.all, { params: query });
+  const res = await axiosInstance.get(CATALOG_ROUTES.all, { params });
   return parseListResponse(res);
 };
 
 /**
  * @param {'necklaces'|'bracelets'|'earrings'|'rings'|'gifts'} categorySlug
- * @param {{ page?: number, limit?: number, search?: string, inStockOnly?: boolean }} [params]
+ * @param {{ page?: number, limit?: number, search?: string, locale?: 'nl'|'en' }} [params]
  */
 export const listCatalogProducts = async (categorySlug, params = {}) => {
-  const query = { ...params };
-  if (query.inStockOnly) {
-    query.inStockOnly = true;
-  }
-  const res = await axiosInstance.get(CATALOG_ROUTES.list(categorySlug), { params: query });
+  const res = await axiosInstance.get(CATALOG_ROUTES.list(categorySlug), { params });
   return parseListResponse(res);
 };
 
 /**
  * @param {'necklaces'|'bracelets'|'earrings'|'rings'|'gifts'} categorySlug
  * @param {string} productId
+ * @param {{ locale?: 'nl'|'en' }} [params]
  */
-export const getCatalogProduct = async (categorySlug, productId) => {
-  const res = await axiosInstance.get(CATALOG_ROUTES.detail(categorySlug, productId));
+export const getCatalogProduct = async (categorySlug, productId, params = {}) => {
+  const res = await axiosInstance.get(CATALOG_ROUTES.detail(categorySlug, productId), { params });
   return parseProductResponse(res);
 };

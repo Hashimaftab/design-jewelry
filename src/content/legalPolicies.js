@@ -121,7 +121,7 @@ export const legalPolicies = {
         {
           title: '5. Defecte artikelen',
           paragraphs: [
-            'Als je artikel beschadigd aankomt of je denkt dat het defect is, neem dan contact met ons op via husnjewelryx@gmail.com. Wij beoordelen het probleem zorgvuldig in overeenstemming met het Nederlandse consumentenrecht.',
+            'Als je artikel beschadigd aankomt of je denkt dat het defect is, neem dan contact met ons op via orders@husnx.com. Wij beoordelen het probleem zorgvuldig in overeenstemming met het Nederlandse consumentenrecht.',
             'Je wettelijke consumentenrechten blijven onverminderd van kracht.',
           ],
         },
@@ -129,8 +129,9 @@ export const legalPolicies = {
           title: '6. Contact',
           bullets: [
             { label: 'Bedrijfsnaam', text: 'HUSN BV' },
-            { label: 'E-mail', text: 'husnjewelryx@gmail.com' },
-            { label: 'Retouradres', text: 'Neem vóór verzending contact op via husnjewelryx@gmail.com voor retourinstructies en het juiste retouradres.' },
+            { label: 'E-mail', text: 'orders@husnx.com' },
+            { label: 'Telefoon', text: '+31 6 87903467' },
+            { label: 'Retouradres', text: 'Neem vóór verzending contact op via orders@husnx.com voor retourinstructies en het juiste retouradres.' },
           ],
         },
       ],
@@ -350,7 +351,7 @@ export const legalPolicies = {
         {
           title: '5. Defective Items',
           paragraphs: [
-            'If your item arrives damaged or you believe it is defective, contact us at husnjewelryx@gmail.com. We will assess the issue fairly in accordance with Dutch consumer law.',
+            'If your item arrives damaged or you believe it is defective, contact us at orders@husnx.com. We will assess the issue fairly in accordance with Dutch consumer law.',
             'Your statutory consumer rights remain unaffected.',
           ],
         },
@@ -358,8 +359,9 @@ export const legalPolicies = {
           title: '6. Contact',
           bullets: [
             { label: 'Business Name', text: 'HUSN BV' },
-            { label: 'Email', text: 'husnjewelryx@gmail.com' },
-            { label: 'Return Address', text: 'Contact us at husnjewelryx@gmail.com before shipping for return instructions and the correct return address.' },
+            { label: 'Email', text: 'orders@husnx.com' },
+            { label: 'Phone', text: '+31 6 87903467' },
+            { label: 'Return Address', text: 'Contact us at orders@husnx.com before shipping for return instructions and the correct return address.' },
           ],
         },
       ],

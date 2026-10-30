@@ -17,13 +17,12 @@ const CATEGORY_META = {
 };
 
 const CategoryCollection = ({ category, search }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,7 +34,7 @@ const CategoryCollection = ({ category, search }) => {
         const result = await listCatalogProducts(category, {
           page,
           limit: PAGE_SIZE,
-          inStockOnly,
+          locale: language,
           search,
         });
         if (!cancelled) {
@@ -53,7 +52,7 @@ const CategoryCollection = ({ category, search }) => {
       };
     load();
     return () => { cancelled = true; };
-  }, [category, page, inStockOnly, search, t]);
+  }, [category, language, page, search, t]);
 
   if (!isValidCategory(category)) {
     return <Navigate to="/collections/necklaces" replace />;
@@ -80,25 +79,6 @@ const CategoryCollection = ({ category, search }) => {
       </div>
 
       <div className="container">
-        <div className="category-filters">
-          <div className="filter-group">
-            <button
-              type="button"
-              className={`filter-btn ${!inStockOnly ? 'active' : ''}`}
-              onClick={() => { setPage(1); setInStockOnly(false); }}
-            >
-              {t('category.all')}
-            </button>
-            <button
-              type="button"
-              className={`filter-btn ${inStockOnly ? 'active' : ''}`}
-              onClick={() => { setPage(1); setInStockOnly(true); }}
-            >
-              {t('category.inStock')}
-            </button>
-          </div>
-        </div>
-
         {error ? (
           <p className="category-error" role="alert">
             {error}

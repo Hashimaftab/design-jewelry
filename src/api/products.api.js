@@ -18,6 +18,8 @@ export function productsBasePath(categorySlug) {
  * @param {{
  *   name?: string,
  *   description?: string,
+ *   descriptionNl?: string,
+ *   descriptionEn?: string,
  *   price?: number,
  *   discountPercent?: number,
  *   quantity?: number,
@@ -30,12 +32,14 @@ export function productsBasePath(categorySlug) {
  */
 export function buildProductFormData(fields) {
   const form = new FormData();
-  const { name, description, price, discountPercent, quantity, isAvailable, image, images, existingImages, category } = fields;
+  const { name, description, descriptionNl, descriptionEn, price, discountPercent, quantity, isAvailable, image, images, existingImages, category } = fields;
 
   if (category !== undefined) form.append('category', category);
 
   if (name !== undefined) form.append('name', name);
   if (description !== undefined) form.append('description', description);
+  if (descriptionNl !== undefined) form.append('descriptionNl', descriptionNl);
+  if (descriptionEn !== undefined) form.append('descriptionEn', descriptionEn);
   if (price !== undefined) form.append('price', String(price));
   if (discountPercent !== undefined) form.append('discountPercent', String(discountPercent));
   if (quantity !== undefined) form.append('quantity', String(Math.max(0, Math.floor(Number(quantity)))));

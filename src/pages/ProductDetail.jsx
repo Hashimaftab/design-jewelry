@@ -12,7 +12,7 @@ import { getCurrentProductPrice } from '../utils/productHelpers';
 
 
 const ProductDetail = () => {
-  const { t, locale } = useLanguage();
+  const { t, locale, language } = useLanguage();
   const { category, productId } = useParams();
 
   const { addToCart } = useCart();
@@ -33,7 +33,7 @@ const ProductDetail = () => {
       setLoading(true);
       setError('');
       try {
-        const p = await getCatalogProduct(category, productId);
+        const p = await getCatalogProduct(category, productId, { locale: language });
         if (cancelled) return;
         if (!p) {
           setError(t('product.notFound'));
@@ -58,7 +58,7 @@ const ProductDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [category, productId, t]);
+  }, [category, language, productId, t]);
 
   if (!isValidCategory(category)) {
     return <Navigate to="/collections/necklaces" replace />;
@@ -106,6 +106,9 @@ const ProductDetail = () => {
     ? product.images
     : product.imageUrl ? [product.imageUrl] : [];
   const currentImage = images[selectedImageIndex] || product.imageUrl;
+  const description = language === 'nl'
+    ? product.descriptionNl || product.description
+    : product.descriptionEn || product.description;
 
   return (
     <div className="product-detail">
@@ -165,7 +168,7 @@ const ProductDetail = () => {
 
             <div className="product-detail__description">
               <h2>{t('product.description')}</h2>
-              <p>{product.description || t('product.noDescription')}</p>
+              <p>{description || t('product.noDescription')}</p>
             </div>
 
             {product.inStock ? (

@@ -24,7 +24,8 @@ const AdminProductForm = ({ allCollections = false }) => {
   const isCreate = !isEdit;
 
   const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [descriptionNl, setDescriptionNl] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
   const [price, setPrice] = useState('');
   const [discountPercent, setDiscountPercent] = useState('0');
   const [quantity, setQuantity] = useState('0');
@@ -52,7 +53,8 @@ const AdminProductForm = ({ allCollections = false }) => {
     if (!isEdit) {
       setName('');
       setSelectedCategory(category || 'necklaces');
-      setDescription('');
+      setDescriptionNl('');
+      setDescriptionEn('');
       setPrice('');
       setDiscountPercent('0');
       setQuantity('0');
@@ -79,7 +81,8 @@ const AdminProductForm = ({ allCollections = false }) => {
         setNotFound(false);
         setName(p.name);
         setSelectedCategory(p.categorySlug);
-        setDescription(p.description);
+        setDescriptionNl(p.descriptionNl || p.description);
+        setDescriptionEn(p.descriptionEn || p.description);
         setPrice(String(p.price));
         setDiscountPercent(String(p.discountPercent ?? 0));
         setQuantity(String(p.quantity));
@@ -197,8 +200,8 @@ const AdminProductForm = ({ allCollections = false }) => {
       setError('Name is required.');
       return;
     }
-    if (!description.trim()) {
-      setError('Description is required.');
+    if (!descriptionNl.trim() || !descriptionEn.trim()) {
+      setError('Dutch and English descriptions are required.');
       return;
     }
     if (Number.isNaN(qtyNum) || qtyNum < 0) {
@@ -222,7 +225,9 @@ const AdminProductForm = ({ allCollections = false }) => {
       const fields = {
         ...(allCollections && isEdit ? { category: CATEGORY_SLUG_TO_DB[selectedCategory] } : {}),
         name: name.trim(),
-        description: description.trim(),
+        description: descriptionNl.trim(),
+        descriptionNl: descriptionNl.trim(),
+        descriptionEn: descriptionEn.trim(),
         price: priceNum,
         discountPercent: discountNum,
         quantity: qtyNum,
@@ -326,13 +331,25 @@ const AdminProductForm = ({ allCollections = false }) => {
         </div>
 
         <div className="admin-product-form__field">
-          <label htmlFor="p-desc">Description</label>
+          <label htmlFor="p-desc-nl">Beschrijving (Nederlands)</label>
           <textarea
-            id="p-desc"
+            id="p-desc-nl"
             className="admin-product-form__textarea"
             rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={descriptionNl}
+            onChange={(e) => setDescriptionNl(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="admin-product-form__field">
+          <label htmlFor="p-desc-en">Description (English)</label>
+          <textarea
+            id="p-desc-en"
+            className="admin-product-form__textarea"
+            rows={4}
+            value={descriptionEn}
+            onChange={(e) => setDescriptionEn(e.target.value)}
             required
           />
         </div>

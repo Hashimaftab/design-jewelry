@@ -96,6 +96,8 @@ export function normalizeProduct(p) {
     categorySlug,
     name: p.name ?? '',
     description: p.description ?? '',
+    descriptionNl: p.descriptionNl ?? p.description_nl ?? '',
+    descriptionEn: p.descriptionEn ?? p.description_en ?? '',
     price: originalPrice,
     originalPrice,
     salePrice: Number.isFinite(salePrice) ? salePrice : originalPrice,
