@@ -107,7 +107,7 @@ const ProductDetail = () => {
     : product.imageUrl ? [product.imageUrl] : [];
   const currentImage = images[selectedImageIndex] || product.imageUrl;
   const description = language === 'nl'
-    ? product.descriptionNl || product.description
+    ? product.descriptionNl || (product.descriptionEn ? '' : product.description)
     : product.descriptionEn || product.description;
 
   return (
