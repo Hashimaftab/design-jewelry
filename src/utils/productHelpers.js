@@ -99,6 +99,7 @@ export function normalizeProduct(p) {
     descriptionNl: p.descriptionNl ?? p.description_nl ?? '',
     descriptionEn: p.descriptionEn ?? p.description_en ?? '',
     price: originalPrice,
+    basePrice: Number(p.basePrice ?? p.price) || 0,
     originalPrice,
     salePrice: Number.isFinite(salePrice) ? salePrice : originalPrice,
     discountPercent,

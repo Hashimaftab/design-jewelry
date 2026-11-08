@@ -53,7 +53,6 @@ export default function LegalPage({ policy }) {
                 <strong>HUSN BV</strong>
                 <span>{t('legal.website')}: <a href="https://www.husnx.com">husnx.com</a></span>
                 <span>{t('legal.email')}: <a href="mailto:orders@husnx.com">orders@husnx.com</a></span>
-                <span>{t('legal.phone')}: <a href="tel:+31687903467">+31 6 87903467</a></span>
               </address>
             ) : null}
           </section>

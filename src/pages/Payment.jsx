@@ -285,16 +285,8 @@ const Payment = () => {
                 </div>
                 <div className="summary-item">
                   <span>{t('payment.subtotal')}</span>
-                  <strong>{formatStorePrice(summary.subtotalAmount, locale)}</strong>
+                  <strong>{formatStorePrice(summary.pricesIncludeVat ? summary.subtotalAmount : summary.grandTotalAmount - summary.shippingAmount, locale)}</strong>
                 </div>
-                {summary.vatAmount > 0 ? (
-                  <div className="summary-item">
-                    <span>
-                      {summary.vatLabel} ({summary.vatRatePercent}%)
-                    </span>
-                    <strong>{formatStorePrice(summary.vatAmount, locale)}</strong>
-                  </div>
-                ) : null}
                 {summary.shippingAmount >= 0 ? (
                   <div className="summary-item">
                     <span>{t('payment.shipping')}</span>
@@ -342,14 +334,6 @@ const Payment = () => {
               <span>{t('payment.currency')}</span>
               <strong>{storeConfig?.currencyCode?.toUpperCase() ?? 'EUR'}</strong>
             </div>
-            {storeConfig?.vatRatePercent > 0 ? (
-              <div className="summary-item">
-                <span>{t('payment.vat')}</span>
-                <strong>
-                  {storeConfig.vatRatePercent}% {storeConfig.vatLabel}
-                </strong>
-              </div>
-            ) : null}
           </div>
         </aside>
       </div>

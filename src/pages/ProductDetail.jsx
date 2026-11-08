@@ -166,6 +166,7 @@ const ProductDetail = () => {
             </div>
 
 
+            <p className="product-vat-label">{t('product.vatIncluded')}</p>
             <div className="product-detail__description">
               <h2>{t('product.description')}</h2>
               <p>{description || t('product.noDescription')}</p>

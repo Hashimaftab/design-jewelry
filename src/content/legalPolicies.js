@@ -130,7 +130,6 @@ export const legalPolicies = {
           bullets: [
             { label: 'Bedrijfsnaam', text: 'HUSN BV' },
             { label: 'E-mail', text: 'orders@husnx.com' },
-            { label: 'Telefoon', text: '+31 6 87903467' },
             { label: 'Retouradres', text: 'Neem vóór verzending contact op via orders@husnx.com voor retourinstructies en het juiste retouradres.' },
           ],
         },
@@ -360,7 +359,6 @@ export const legalPolicies = {
           bullets: [
             { label: 'Business Name', text: 'HUSN BV' },
             { label: 'Email', text: 'orders@husnx.com' },
-            { label: 'Phone', text: '+31 6 87903467' },
             { label: 'Return Address', text: 'Contact us at orders@husnx.com before shipping for return instructions and the correct return address.' },
           ],
         },

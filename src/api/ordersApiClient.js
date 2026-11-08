@@ -1,5 +1,5 @@
 /**
- * HUSAN Luxury Jewelry - Orders & Admin API Client
+ * HUSN Luxury Jewelry - Orders & Admin API Client
  *
  * Uses the same API configuration and authentication as the rest of the app.
  */

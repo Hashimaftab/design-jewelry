@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import {
   getCart,
+  getMyOrder,
   addToCart as addToCartApi,
   updateCartItem as updateCartItemApi,
   removeFromCart as removeFromCartApi,
@@ -11,9 +12,12 @@ import { AuthContext } from './AuthContextValue';
 import { getApiErrorMessage } from '../utils/adminAuth';
 
 import { CartContext } from './CartContextValue';
-import { readGuestCart, writeGuestCart } from '../utils/guestCart';
+import { readGuestCart, writeGuestCart, completeGuestOrder } from '../utils/guestCart';
 import { useLanguage } from './LanguageContextValue';
 import { getCurrentProductPrice } from '../utils/productHelpers';
+
+import { guestOrderToken } from '../api/orderAccess';
+import { clearCheckoutAttempt } from '../utils/checkoutAttempt';
 
 const emptyCart = { items: [], itemCount: 0, subtotal: 0 };
 
@@ -153,8 +157,6 @@ export const CartProvider = ({ children }) => {
   const placeOrder = async (details) => {
     try {
       const order = await checkoutCart(details);
-      if (!token) writeGuestCart([]);
-      setCart(emptyCart);
       return { success: true, order };
     } catch (error) {
       return {
@@ -163,6 +165,19 @@ export const CartProvider = ({ children }) => {
       };
     }
   };
+
+  const completePaidOrder = useCallback(async (orderId) => {
+    try {
+      // Read the authoritative order; a redirect URL is not proof of payment.
+      const order = await getMyOrder(orderId);
+      if (order?.paymentStatus !== 'paid') return;
+      if (guestOrderToken(orderId)) completeGuestOrder(order);
+      clearCheckoutAttempt(orderId);
+      await refreshCart();
+    } catch (error) {
+      setCartError(getApiErrorMessage(error, t('cart.loadError')));
+    }
+  }, [refreshCart, t]);
 
   return (
     <CartContext.Provider
@@ -179,6 +194,7 @@ export const CartProvider = ({ children }) => {
         removeItem,
         clearBag,
         placeOrder,
+        completePaidOrder,
       }}
     >
       {children}

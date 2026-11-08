@@ -7,7 +7,7 @@ import { AuthContext } from '../context/AuthContextValue';
 import { getCategoryLabel } from '../constants/productCategories';
 import BrandLogo from '../components/BrandLogo';
 import { formatStorePrice } from '../api/payments.api';
-import { checkoutPayload, prepareCheckoutAttempt, readCheckoutAttempt, clearCheckoutAttempt } from '../utils/checkoutAttempt';
+import { checkoutPayload, prepareCheckoutAttempt, readCheckoutAttempt, rememberCheckoutOrder } from '../utils/checkoutAttempt';
 import { useLanguage } from '../context/LanguageContextValue';
 import { useCheckoutQuote } from '../hooks/useCheckoutQuote';
 
@@ -41,9 +41,7 @@ const Checkout = () => {
     state: '',
     postalCode: '',
     country: language === 'nl' ? 'Nederland' : 'Netherlands',
-    notes: '',
     ...readCheckoutAttempt(owner)?.payload?.contact,
-    ...(readCheckoutAttempt(owner) ? { notes: readCheckoutAttempt(owner).payload.notes } : {}),
   }));
 
   const handleInputChange = (field, value) => {
@@ -77,7 +75,7 @@ const Checkout = () => {
       const payload = prepareCheckoutAttempt(checkoutPayload(shippingForm, cart.items), owner);
       const result = await placeOrder(payload);
       if (!result.success || !result.order?.id) throw new Error(result.message || t('checkout.placeError'));
-      clearCheckoutAttempt();
+      rememberCheckoutOrder(result.order.id, owner);
       navigate(`/payments/${result.order.id}`, { replace: true });
     } catch (err) {
       setError(err.message || t('checkout.placeError'));
@@ -343,17 +341,6 @@ const Checkout = () => {
                   <input id="ship-country" autoComplete="country-name" required maxLength={100}
                     value={shippingForm.country} onChange={(event) => handleInputChange('country', event.target.value)} />
                 </div>
-                <div className="form-row">
-                  <label htmlFor="ship-notes">{t('checkout.notes')}</label>
-                  <input
-                    id="ship-notes"
-                      maxLength={1000} autoComplete="off"
-                    type="text"
-                    placeholder={t('checkout.notesPlaceholder')}
-                    value={shippingForm.notes}
-                    onChange={(e) => handleInputChange('notes', e.target.value)}
-                  />
-                </div>
 
                 <button
                   type="submit"
@@ -416,10 +403,6 @@ const Checkout = () => {
               </div>
               {quote ? (
                 <>
-                  <div className="total-row">
-                    <span>{t('payment.vat')} ({quote.vatRatePercent}%)</span>
-                    <span>{formatStorePrice(quote.vatAmount, locale)}</span>
-                  </div>
                   <div className="total-row">
                     <span>{t('payment.shipping')}</span>
                     <span>{quote.shippingAmount === 0 ? t('checkout.free') : formatStorePrice(quote.shippingAmount, locale)}</span>

@@ -46,7 +46,7 @@ const AdminLayout = () => {
     <div className="admin-shell">
       <aside className={`admin-sidebar ${sidebarOpen ? 'admin-sidebar--open' : ''}`}>
         <div className="admin-sidebar__head">
-          <span className="admin-sidebar__logo">HUSAN</span>
+          <span className="admin-sidebar__logo">HUSN</span>
           <span className="admin-sidebar__tag">Console</span>
         </div>
 

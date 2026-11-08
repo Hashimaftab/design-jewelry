@@ -22,7 +22,7 @@ test('checkout sends only contract fields and preserves UUIDs', () => {
   const payload = checkoutPayload({ ...form, paymentMethod: 'ignored' }, items);
   assert.deepEqual(payload.items, [{ productId, quantity: 2 }]);
   assert.equal(payload.contact.fullName, 'Jane Doe');
-  assert.deepEqual(Object.keys(payload).sort(), ['contact', 'items', 'notes']);
+  assert.deepEqual(Object.keys(payload).sort(), ['contact', 'items']);
   assert.equal('paymentMethod' in payload.contact, false);
   for (const invalid of [1, '1', 'invalid']) assert.throws(() => checkoutPayload(form, [{ productId: invalid, quantity: 1 }]));
 });
@@ -33,19 +33,19 @@ test('timeout and reload reuse full private request; edits and accounts get a ne
   assert.deepEqual(prepareCheckoutAttempt(payload), first);
   assert.deepEqual(readCheckoutAttempt().payload, first);
   assert.equal(readCheckoutAttempt('customer'), null);
-  assert.notEqual(prepareCheckoutAttempt({ ...payload, notes: 'Changed' }).checkoutKey, first.checkoutKey);
+  assert.notEqual(prepareCheckoutAttempt({ ...payload, contact: { ...payload.contact, city: 'Rotterdam' } }).checkoutKey, first.checkoutKey);
   const account = prepareCheckoutAttempt(payload, 'customer');
   assert.notEqual(account.checkoutKey, first.checkoutKey);
   clearCheckoutAttempt();
   assert.equal(readCheckoutAttempt('customer'), null);
 });
 
-test('required contact, phone, notes and quantity limits fail before submission', () => {
+test('required contact, phone and quantity limits fail before submission', () => {
   for (const field of ['fullName', 'email', 'phone', 'addressLine1', 'city', 'postalCode', 'country']) assert.throws(() => checkoutPayload({ ...form, [field]: '' }, items));
   for (const phone of ['-------', '123456', '1234567+', '1234567abc']) assert.throws(() => checkoutPayload({ ...form, phone }, items));
   for (const quantity of [0, -1, 101, 1.5, '2']) assert.throws(() => checkoutPayload(form, [{ productId, quantity }]));
   assert.throws(() => checkoutPayload(form, []));
-  assert.throws(() => checkoutPayload({ ...form, notes: 'a'.repeat(1001) }, items));
+  assert.equal('notes' in checkoutPayload({ ...form, notes: 'Old gift instruction' }, items), false);
 });
 
 test('guest bag survives reload with estimated totals and handles corrupt storage', () => {

@@ -83,7 +83,7 @@ const AdminProductForm = ({ allCollections = false }) => {
         setSelectedCategory(p.categorySlug);
         setDescriptionNl(p.descriptionNl || p.description);
         setDescriptionEn(p.descriptionEn || p.description);
-        setPrice(String(p.price));
+        setPrice(String(p.basePrice));
         setDiscountPercent(String(p.discountPercent ?? 0));
         setQuantity(String(p.quantity));
         setIsAvailable(p.isAvailable);
@@ -356,7 +356,7 @@ const AdminProductForm = ({ allCollections = false }) => {
 
         <div className="admin-product-form__row">
           <div className="admin-product-form__field">
-            <label htmlFor="p-price">Price (EUR)</label>
+            <label htmlFor="p-price">Base price (EUR, excluding VAT)</label>
             <input
               id="p-price"
               type="number"
@@ -367,6 +367,7 @@ const AdminProductForm = ({ allCollections = false }) => {
               onChange={(e) => setPrice(e.target.value)}
               required
             />
+              <p className="admin-product-form__hint">21% VAT is added automatically. Customer price after discount: {new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Math.round((Number(price || 0) * (1 - Number(discountPercent || 0) / 100) * 1.21 + Number.EPSILON) * 100) / 100)} (VAT included).</p>
           </div>
           <div className="admin-product-form__field">
             <label htmlFor="p-qty">Quantity</label>

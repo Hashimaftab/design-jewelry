@@ -68,8 +68,7 @@ const ProductCard = ({ product, categorySlug }) => {
           </div>
         </div>
         <div className="product-info">
-          <h3 className="product-name">{product.name}</h3>
-          <div className="product-price-group">
+          <h3 className="product-name">{product.name}</h3>          <div className="product-price-group">
             {product.onSale ? (
               <span className="product-price product-price--original">
                 {formatMoney(product.originalPrice, locale)}

@@ -42,7 +42,7 @@ const AdminLogin = () => {
           <div className="admin-login__mark">
             <Lock size={22} strokeWidth={1.25} />
           </div>
-          <p className="admin-login__house">HUSAN</p>
+          <p className="admin-login__house">HUSN</p>
           <h1>Atelier console</h1>
           <p className="admin-login__subtitle">
             Secure access for curators and operations. Customer accounts cannot sign in here.
@@ -58,7 +58,7 @@ const AdminLogin = () => {
               id="admin-email"
               type="email"
               className="admin-login__input"
-              placeholder="you@husan.com"
+              placeholder="you@husnx.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"

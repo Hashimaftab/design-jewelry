@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useCart } from '../context/CartContextValue';
 import { AuthContext } from '../context/AuthContextValue';
 import { getOrderPaymentSummary, formatStorePrice, ApiRequestError } from '../api/payments.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
@@ -131,6 +132,7 @@ const OrderSuccess = () => {
   const translateRef = useRef(t);
   useEffect(() => { translateRef.current = t; }, [t]);
   const { token } = useContext(AuthContext);
+  const { completePaidOrder } = useCart();
   const { orderId } = useParams();
   const [searchParams] = useSearchParams();
 
@@ -148,7 +150,8 @@ const OrderSuccess = () => {
       try {
         const orderSummary = await waitForPaidOrder(orderId, token, () => cancelled);
         if (cancelled) return;
-        setSummary(orderSummary);
+        if (orderSummary?.paymentStatus === 'paid') await completePaidOrder(orderId);
+        if (!cancelled) setSummary(orderSummary);
       } catch (err) {
         if (cancelled) return;
         setError(
@@ -162,7 +165,7 @@ const OrderSuccess = () => {
     };
     load();
     return () => { cancelled = true; };
-  }, [token, orderId, stripeRedirectStatus]);
+  }, [token, orderId, stripeRedirectStatus, completePaidOrder]);
 
   if (loading) {
     return (
@@ -177,33 +180,6 @@ const OrderSuccess = () => {
   }
 
   if (error) {
-    // Stripe confirmed payment — show success even if backend auth failed after redirect
-    if (stripeRedirectStatus === 'succeeded') {
-      return (
-        <div className="checkout-page">
-          <div className="checkout-container container checkout-container--narrow">
-            <div className="checkout-success">
-              <SuccessIcon />
-              <h1>{t('success.title')}</h1>
-              <p className="checkout-success__sub">
-                {t('success.message', { order: `#${orderId?.slice(0, 8).toUpperCase()}` })}
-              </p>
-              <div className="order-confirm__ref" style={{ marginTop: '1.5rem' }}>
-                <span>{t('success.orderRef')}</span>
-                <strong>#{orderId?.slice(0, 8).toUpperCase()}</strong>
-              </div>
-              <div className="checkout-success__actions">
-                <Link to="/" className="pay-now-btn checkout-success__btn">
-                  <span>{t('success.continue')}</span>
-                  <span className="pay-btn-gleam" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="checkout-page">
         <div className="checkout-container container">

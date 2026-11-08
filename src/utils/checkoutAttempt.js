@@ -20,7 +20,16 @@ export function prepareCheckoutAttempt(payload, owner = 'guest') {
   return request;
 }
 
-export function clearCheckoutAttempt() {
+export function rememberCheckoutOrder(orderId, owner = 'guest') {
+  const attempt = readCheckoutAttempt(owner);
+  if (attempt) sessionStorage.setItem(CHECKOUT_ATTEMPT_KEY, JSON.stringify({ ...attempt, orderId }));
+}
+
+export function clearCheckoutAttempt(orderId) {
+  if (orderId) {
+    const attempt = JSON.parse(sessionStorage.getItem(CHECKOUT_ATTEMPT_KEY) || 'null');
+    if (attempt?.orderId !== orderId) return;
+  }
   sessionStorage.removeItem(CHECKOUT_ATTEMPT_KEY);
 }
 
@@ -36,13 +45,11 @@ export function checkoutPayload(form, items) {
     if (!contact[field] || contact[field].length > limit) throw new Error(`${label} is required and must be at most ${limit} characters.`);
   }
   if (contact.addressLine2.length > 255 || contact.state.length > 100) throw new Error('Apartment or state is too long.');
-  const notes = String(form.notes || '').trim();
-  if (notes.length > 1000) throw new Error('Notes must be at most 1,000 characters.');
   if (!items.length || items.length > 100) throw new Error('Your bag must contain 1–100 items.');
   const lines = items.map(({ productId, quantity }) => {
     if (typeof productId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId)) throw new Error('A product in your bag is unavailable. Remove it and add it again from the catalog.');
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) throw new Error('Each quantity must be between 1 and 100.');
     return { productId, quantity };
   });
-  return { contact, notes, items: lines };
+  return { contact, items: lines };
 }
