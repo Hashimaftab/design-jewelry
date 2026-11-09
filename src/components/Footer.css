@@ -92,6 +92,12 @@
   transform: translateX(4px);
 }
 
+.footer-col .footer-email {
+  color: #97732d;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 .footer-bottom {
   text-align: center;
   padding-top: 2rem;

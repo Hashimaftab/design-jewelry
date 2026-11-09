@@ -16,6 +16,7 @@ import AdminPrivateRoute from './components/AdminPrivateRoute';
 import AdminPublicRoute from './components/AdminPublicRoute';
 
 import CartToast from './components/CartToast';
+import EmailContactButton from './components/EmailContactButton';
 import { useLanguage } from './context/LanguageContextValue';
 import './App.css';
 
@@ -56,6 +57,7 @@ function App() {
       <ScrollToTop />
       <a className="skip-link" href="#main-content">{storefrontText('app.skipToContent', 'Skip to content')}</a>
       {!isAdmin && <CartToast />}
+      {!isAdmin && <EmailContactButton />}
       {!hideNavbarFooter && <Navbar />}
       <main id="main-content">
         <Suspense fallback={<p className="route-loading" role="status">{storefrontText('common.loading', 'Loading…')}</p>}>

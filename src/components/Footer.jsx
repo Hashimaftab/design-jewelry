@@ -5,6 +5,7 @@ import './Footer.css';
 
 const Footer = () => {
   const { t } = useLanguage();
+  const supportEmail = 'orders@husnx.com';
   return (
     <footer className="footer">
       <div className="container footer-container">
@@ -26,7 +27,8 @@ const Footer = () => {
           <div className="footer-col">
             <h3>{t('footer.support')}</h3>
             <ul>
-              <li><a href="#">{t('footer.contact')}</a></li>
+              <li><a href={`mailto:${supportEmail}`}>{t('footer.contact')}</a></li>
+              <li><a className="footer-email" href={`mailto:${supportEmail}`}>{supportEmail}</a></li>
               <li><Link to="/shipping-policy">{t('footer.shippingPolicy')}</Link></li>
               <li><Link to="/return-policy">{t('footer.returnPolicy')}</Link></li>
               <li><Link to="/terms-of-service">{t('footer.termsOfService')}</Link></li>
