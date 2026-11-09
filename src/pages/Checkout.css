@@ -12,7 +12,20 @@
 }
 
 .checkout-main {
-  flex: 1.25;
+  width: 100%;
+  min-width: 0;
+}
+
+.checkout-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.checkout-selection-column,
+.checkout-delivery-column {
+  min-width: 0;
 }
 
 .checkout-header {
@@ -283,13 +296,11 @@
 
 /* Sidebar / Summary Card */
 .checkout-sidebar {
-  flex: 0.85;
-  position: relative;
+  width: 100%;
 }
 
 .summary-card {
-  position: sticky;
-  top: 2rem;
+  position: static;
   background: #ffffff;
   border: 1px solid var(--border-gold);
   border-radius: 14px;
@@ -728,6 +739,9 @@
 @media (max-width: 900px) {
   .checkout-container {
     flex-direction: column;
+  }
+  .checkout-columns {
+    grid-template-columns: minmax(0, 1fr);
   }
   .checkout-stepper {
     flex-wrap: wrap;

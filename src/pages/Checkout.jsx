@@ -123,8 +123,10 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* Bag Items Section */}
-          <section className="form-section">
+          <div className="checkout-columns">
+            <div className="checkout-selection-column">
+              {/* Bag Items Section */}
+              <section className="form-section">
             <div className="section-heading-wrap">
               <h2>{t('checkout.yourSelection')}</h2>
               <span className="luxury-tag">
@@ -218,11 +220,65 @@ const Checkout = () => {
                 </AnimatePresence>
               </ul>
             )}
-          </section>
+              </section>
 
-          {/* Delivery & Shipping Information Section */}
-          {!isEmpty && !loading && !cartError && (
-            <section className="form-section">
+              {/* Order Summary — kept with the customer's selection */}
+              <aside className="checkout-sidebar">
+                <div className="summary-card">
+                  <h3>{t('checkout.summary')}</h3>
+
+                  <div className="summary-items">
+                    {cart.items.map((line) => {
+                      const p = line.product;
+                      return (
+                        <div key={line.productId} className="summary-item">
+                          <div className="item-img">
+                            {p?.imageUrl ? (
+                              <img src={p.imageUrl} alt={p.name} />
+                            ) : null}
+                            <span className="item-qty">{line.quantity}</span>
+                          </div>
+                          <div className="item-info">
+                            <h4>{p?.name ?? t('checkout.product')}</h4>
+                            <p>{p?.categorySlug ? getLocalizedCategoryLabel(p.categorySlug) : ''}</p>
+                          </div>
+                          <div className="item-price">{formatStorePrice(line.lineTotal, locale)}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="summary-totals">
+                    <div className="total-row">
+                      <span>{t('checkout.subtotalItems', { count: cart.itemCount })}</span>
+                      <span>{formatStorePrice(quote?.subtotalAmount ?? cart.subtotal, locale)}</span>
+                    </div>
+                    {quote ? (
+                      <>
+                        <div className="total-row">
+                          <span>{t('payment.shipping')}</span>
+                          <span>{quote.shippingAmount === 0 ? t('checkout.free') : formatStorePrice(quote.shippingAmount, locale)}</span>
+                        </div>
+                        <div className="total-row grand-total">
+                          <span>{t('payment.total')}</span>
+                          <span>{formatStorePrice(quote.grandTotalAmount, locale)}</span>
+                        </div>
+                      </>
+                    ) : cart.items.length > 0 ? (
+                      <div role={quoteError ? 'alert' : 'status'}>
+                        <p>{t(quoteError ? 'checkout.totalsError' : 'checkout.totalsLoading')}</p>
+                        {quoteError && <button type="button" onClick={retryQuote}>{t('checkout.retryTotals')}</button>}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <div className="checkout-delivery-column">
+              {/* Delivery & Shipping Information Section */}
+              {!isEmpty && !loading && !cartError && (
+                <section className="form-section">
               <div className="section-heading-wrap">
                 <h2>{t('checkout.shippingAddress')}</h2>
                 <span className="luxury-tag">
@@ -366,61 +422,11 @@ const Checkout = () => {
                 </div>
                 </fieldset>
               </form>
-            </section>
-          )}
-        </div>
-
-        {/* Order Summary Sidebar */}
-        <aside className="checkout-sidebar">
-          <div className="summary-card">
-            <h3>{t('checkout.summary')}</h3>
-
-            <div className="summary-items">
-              {cart.items.map((line) => {
-                const p = line.product;
-                return (
-                  <div key={line.productId} className="summary-item">
-                    <div className="item-img">
-                      {p?.imageUrl ? (
-                        <img src={p.imageUrl} alt={p.name} />
-                      ) : null}
-                      <span className="item-qty">{line.quantity}</span>
-                    </div>
-                    <div className="item-info">
-                      <h4>{p?.name ?? t('checkout.product')}</h4>
-                      <p>{p?.categorySlug ? getLocalizedCategoryLabel(p.categorySlug) : ''}</p>
-                    </div>
-                    <div className="item-price">{formatStorePrice(line.lineTotal, locale)}</div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="summary-totals">
-              <div className="total-row">
-                <span>{t('checkout.subtotalItems', { count: cart.itemCount })}</span>
-                <span>{formatStorePrice(quote?.subtotalAmount ?? cart.subtotal, locale)}</span>
-              </div>
-              {quote ? (
-                <>
-                  <div className="total-row">
-                    <span>{t('payment.shipping')}</span>
-                    <span>{quote.shippingAmount === 0 ? t('checkout.free') : formatStorePrice(quote.shippingAmount, locale)}</span>
-                  </div>
-                  <div className="total-row grand-total">
-                    <span>{t('payment.total')}</span>
-                    <span>{formatStorePrice(quote.grandTotalAmount, locale)}</span>
-                  </div>
-                </>
-              ) : cart.items.length > 0 ? (
-                <div role={quoteError ? 'alert' : 'status'}>
-                  <p>{t(quoteError ? 'checkout.totalsError' : 'checkout.totalsLoading')}</p>
-                  {quoteError && <button type="button" onClick={retryQuote}>{t('checkout.retryTotals')}</button>}
-                </div>
-              ) : null}
+                </section>
+              )}
             </div>
           </div>
-        </aside>
+        </div>
       </div>
     </div>
   );
