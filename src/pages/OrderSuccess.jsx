@@ -2,7 +2,12 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContextValue';
 import { AuthContext } from '../context/AuthContextValue';
-import { getOrderPaymentSummary, formatStorePrice, ApiRequestError } from '../api/payments.api';
+import {
+  getOrderPaymentSummary,
+  getPublicPaymentStatus,
+  formatStorePrice,
+  ApiRequestError,
+} from '../api/payments.api';
 import { getApiErrorMessage } from '../utils/adminAuth';
 import { useLanguage } from '../context/LanguageContextValue';
 
@@ -74,18 +79,24 @@ function OrderConfirmDetails({ summary, orderId, t, locale, token }) {
       <div className="order-confirm__section">
         <h3>{t('success.orderSummary')}</h3>
         <div className="order-confirm__totals">
-          <div className="order-confirm__total-row">
-            <span>{t('success.subtotal')}</span>
-            <span>{formatStorePrice(summary?.subtotalAmount ?? 0, locale)}</span>
-          </div>
-          <div className="order-confirm__total-row">
-            <span>{summary?.vatLabel ?? t('success.tax')}</span>
-            <span>{formatStorePrice(summary?.vatAmount ?? 0, locale)}</span>
-          </div>
-          <div className="order-confirm__total-row">
-            <span>{t('success.shipping')}</span>
-            <span>{formatStorePrice(summary?.shippingAmount ?? 0, locale)}</span>
-          </div>
+          {summary?.subtotalAmount != null && (
+            <div className="order-confirm__total-row">
+              <span>{t('success.subtotal')}</span>
+              <span>{formatStorePrice(summary.subtotalAmount, locale)}</span>
+            </div>
+          )}
+          {summary?.vatAmount != null && (
+            <div className="order-confirm__total-row">
+              <span>{summary?.vatLabel ?? t('success.tax')}</span>
+              <span>{formatStorePrice(summary.vatAmount, locale)}</span>
+            </div>
+          )}
+          {summary?.shippingAmount != null && (
+            <div className="order-confirm__total-row">
+              <span>{t('success.shipping')}</span>
+              <span>{formatStorePrice(summary.shippingAmount, locale)}</span>
+            </div>
+          )}
           <div className="order-confirm__total-row order-confirm__total-row--grand">
             <span>{t('success.total')}</span>
             <strong>{formatStorePrice(summary?.grandTotalAmount ?? 0, locale)}</strong>
@@ -148,9 +159,30 @@ const OrderSuccess = () => {
       setLoading(true);
       setError('');
       try {
-        const orderSummary = await waitForPaidOrder(orderId, token, () => cancelled);
+        let orderSummary;
+        try {
+          orderSummary = await waitForPaidOrder(orderId, token, () => cancelled);
+        } catch (err) {
+          const paymentIntentId = searchParams.get('payment_intent');
+          if (err instanceof ApiRequestError && err.status === 401 && stripeRedirectStatus === 'succeeded' && paymentIntentId) {
+            const publicStatus = await getPublicPaymentStatus(orderId, paymentIntentId);
+            if (publicStatus?.paymentStatus === 'paid') {
+              orderSummary = {
+                id: orderId,
+                paymentStatus: 'paid',
+                grandTotalAmount: publicStatus.grandTotalAmount,
+              };
+            } else {
+              throw err;
+            }
+          } else {
+            throw err;
+          }
+        }
         if (cancelled) return;
-        if (orderSummary?.paymentStatus === 'paid') await completePaidOrder(orderId);
+        if (orderSummary?.paymentStatus === 'paid' && (token || orderSummary.items)) {
+          await completePaidOrder(orderId);
+        }
         if (!cancelled) setSummary(orderSummary);
       } catch (err) {
         if (cancelled) return;
@@ -165,7 +197,7 @@ const OrderSuccess = () => {
     };
     load();
     return () => { cancelled = true; };
-  }, [token, orderId, stripeRedirectStatus, completePaidOrder]);
+  }, [token, orderId, stripeRedirectStatus, completePaidOrder, searchParams]);
 
   if (loading) {
     return (

@@ -40,6 +40,7 @@ export const CART_ROUTES = {
 export const PAYMENT_ROUTES = {
   storeConfig: '/payments/store-config',
   orderSummary: (orderId) => `/payments/orders/${orderId}/summary`,
+  orderStatus: (orderId) => `/payments/orders/${orderId}/status`,
   createIntent: (orderId) => `/payments/orders/${orderId}/intent`,
   confirmPayment: (orderId) => `/payments/orders/${orderId}/confirm`,
 };

@@ -15,7 +15,7 @@ test('checkout and payment API use one endpoint, save guest access, and isolate 
   try {
     const { default: client } = await server.ssrLoadModule('/src/api/axiosInstance.js');
     const { checkoutCart, getMyOrder } = await server.ssrLoadModule('/src/api/cart.api.js');
-    const { getOrderPaymentSummary, createStripePaymentIntent } = await server.ssrLoadModule('/src/api/payments.api.js');
+    const { getOrderPaymentSummary, createStripePaymentIntent, getPublicPaymentStatus } = await server.ssrLoadModule('/src/api/payments.api.js');
     const { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } = await server.ssrLoadModule('/src/constants/userAuth.js');
     const { ADMIN_TOKEN_KEY } = await server.ssrLoadModule('/src/constants/adminAuth.js');
     localStorage.setItem(ADMIN_TOKEN_KEY, 'admin-must-not-be-used');
@@ -27,6 +27,7 @@ test('checkout and payment API use one endpoint, save guest access, and isolate 
       if (mode === 'timeout') throw Object.assign(new Error('Network timeout'), { config });
       if (mode === '401') throw Object.assign(new Error('Unauthorized'), { config, response: { status: 401, data: { message: 'Order token expired' } } });
       const data = config.url.endsWith('/summary') ? { summary: order }
+        : config.url.includes('/status?') ? { paymentStatus: 'paid', grandTotalAmount: 66.45 }
         : config.url.endsWith('/intent') ? { clientSecret: 'test-secret' }
           : { order, guestOrderToken: 'private-order-token' };
       return { status: 201, statusText: 'Created', headers: {}, config, data: { success: true, data } };
@@ -43,9 +44,14 @@ test('checkout and payment API use one endpoint, save guest access, and isolate 
     assert.equal((await getOrderPaymentSummary(order.id)).grandTotalAmount, 66.45);
     assert.equal((await createStripePaymentIntent(order.id)).clientSecret, 'test-secret');
     for (const call of calls.slice(1)) {
+      if (call.url.includes('/status?')) continue;
       assert.equal(call.headers['X-Order-Token'], 'private-order-token');
       assert.equal(call.headers.Authorization, undefined);
     }
+    assert.deepEqual(await getPublicPaymentStatus(order.id, 'pi_test'), { paymentStatus: 'paid', grandTotalAmount: 66.45 });
+    assert.equal(calls.at(-1).url, '/payments/orders/test-order/status?payment_intent=pi_test');
+    assert.equal(calls.at(-1).skipCustomerAuth, true);
+    assert.equal(calls.at(-1).headers.Authorization, undefined);
     mode = '401';
     const before401 = calls.length;
     await assert.rejects(getOrderPaymentSummary(order.id), /Order token expired/);

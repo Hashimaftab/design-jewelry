@@ -40,6 +40,18 @@ export const getStoreConfig = async () => {
   }
 };
 
+export const getPublicPaymentStatus = async (orderId, paymentIntentId) => {
+  try {
+    const res = await axiosInstance.get(
+      `${PAYMENT_ROUTES.orderStatus(orderId)}?payment_intent=${encodeURIComponent(paymentIntentId)}`,
+      { skipCustomerAuth: true },
+    );
+    return extractResponseData(res);
+  } catch (error) {
+    throw new ApiRequestError(error);
+  }
+};
+
 export const getOrderPaymentSummary = async (orderId, token) => {
   try {
     const res = await axiosInstance.get(PAYMENT_ROUTES.orderSummary(orderId), {

@@ -73,7 +73,11 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
 
 
       if (paymentIntent.status === 'succeeded') {
-        navigate(`/order-success/${orderId}`, { replace: true });
+        const query = new URLSearchParams({
+          payment_intent: paymentIntent.id,
+          redirect_status: 'succeeded',
+        });
+        navigate(`/order-success/${orderId}?${query.toString()}`, { replace: true });
         return;
       }
 
