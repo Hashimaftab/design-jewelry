@@ -10,8 +10,9 @@ export default function ShipmentEmailDialog({ order, busy, error, onCancel, onSe
   const recipient = order.contact?.email || order.customer?.email || '';
   const [trackingNumber, setTrackingNumber] = useState('');
   const [courier, setCourier] = useState('');
-  const [subject, setSubject] = useState(`Your HUSN order ${getOrderLabel(order)} has been shipped`);
-  const [message, setMessage] = useState(`Hello ${getOrderCustomerName(order)},\n\nYour order has been shipped and is on its way to you.`);
+  const dutch = order.contact?.language === 'nl';
+  const [subject, setSubject] = useState(dutch ? `Je HUSN-bestelling ${getOrderLabel(order)} is verzonden` : `Your HUSN order ${getOrderLabel(order)} has been shipped`);
+  const [message, setMessage] = useState(dutch ? `Hallo ${getOrderCustomerName(order)},\n\nJe bestelling is verzonden en is onderweg naar je.` : `Hello ${getOrderCustomerName(order)},\n\nYour order has been shipped and is on its way to you.`);
 
   useEffect(() => {
     const element = dialog.current;

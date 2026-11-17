@@ -18,7 +18,7 @@ const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
 const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, onError }) {
-  const { t, locale } = useLanguage();
+  const { t, locale, language } = useLanguage();
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -74,6 +74,7 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
 
       if (paymentIntent.status === 'succeeded') {
         const query = new URLSearchParams({
+          lang: language,
           payment_intent: paymentIntent.id,
           redirect_status: 'succeeded',
         });
@@ -85,7 +86,7 @@ function PaymentCheckoutForm({ orderId, grandTotal, returnUrl, billingCountry, o
         onError(t('payment.processingStatus'));
         // Optionally redirect after a delay
         setTimeout(() => {
-          navigate(`/order-success/${orderId}`, { replace: true });
+          navigate(`/order-success/${orderId}?lang=${language}`, { replace: true });
         }, 2000);
         return;
       }
@@ -152,8 +153,8 @@ const Payment = () => {
   const [error, setError] = useState('');
 
   const returnUrl = useMemo(
-    () => `${window.location.origin}/order-success/${orderId}`,
-    [orderId],
+    () => `${window.location.origin}/order-success/${orderId}?lang=${language}`,
+    [orderId, language],
   );
 
   const elementsOptions = useMemo(
@@ -305,7 +306,7 @@ const Payment = () => {
             </div>
 
             {stripePromise ? (
-              <Elements stripe={stripePromise} options={elementsOptions}>
+              <Elements key={`${orderId}-${language}`} stripe={stripePromise} options={elementsOptions}>
                 <PaymentCheckoutForm
                   orderId={orderId}
                   grandTotal={summary.grandTotalAmount}

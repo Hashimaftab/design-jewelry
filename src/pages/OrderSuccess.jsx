@@ -87,7 +87,7 @@ function OrderConfirmDetails({ summary, orderId, t, locale, token }) {
           )}
           {summary?.vatAmount != null && (
             <div className="order-confirm__total-row">
-              <span>{summary?.vatLabel ?? t('success.tax')}</span>
+              <span>{t('success.tax')}</span>
               <span>{formatStorePrice(summary.vatAmount, locale)}</span>
             </div>
           )}

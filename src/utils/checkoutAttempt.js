@@ -33,8 +33,9 @@ export function clearCheckoutAttempt(orderId) {
   sessionStorage.removeItem(CHECKOUT_ATTEMPT_KEY);
 }
 
-export function checkoutPayload(form, items) {
+export function checkoutPayload(form, items, language) {
   const contact = {};
+  if (language === 'nl' || language === 'en') contact.language = language;
   for (const field of ['fullName', 'email', 'phone', 'addressLine1', 'addressLine2', 'city', 'state', 'postalCode', 'country']) {
     contact[field] = String(form[field] || '').trim();
   }

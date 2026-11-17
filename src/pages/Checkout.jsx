@@ -72,7 +72,7 @@ const Checkout = () => {
     submitting.current = true;
     setCheckoutBusy(true);
     try {
-      const payload = prepareCheckoutAttempt(checkoutPayload(shippingForm, cart.items), owner);
+      const payload = prepareCheckoutAttempt(checkoutPayload(shippingForm, cart.items, language), owner);
       const result = await placeOrder(payload);
       if (!result.success || !result.order?.id) throw new Error(result.message || t('checkout.placeError'));
       rememberCheckoutOrder(result.order.id, owner);
